@@ -171,24 +171,6 @@ SysFAA/
 
 ---
 
-## Atualizando o projeto (Git)
-
-Para puxar atualizações do repositório em qualquer máquina:
-
-```bash
-cd C:\xampp\htdocs\SysFAA
-git pull
-```
-
-Para enviar suas alterações:
-
-```bash
-git add .
-git commit -m "descreve o que mudou"
-git push
-```
-
----
 
 ## Problemas comuns
 
