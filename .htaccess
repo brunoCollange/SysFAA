@@ -1,0 +1,32 @@
+# ============================================================
+#  SysFAA — Apache .htaccess (XAMPP / subpasta)
+# ============================================================
+
+Options -Indexes
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Detecta automaticamente o caminho base (funciona em subpasta)
+    RewriteBase /SysFAA/
+
+    # Bloqueia acesso direto à pasta de uploads
+    RewriteRule ^uploads/ - [F,L]
+
+    # Redireciona raiz para login
+    RewriteRule ^$ auth/login.php [R=302,L]
+</IfModule>
+
+# Protege arquivos sensíveis
+<FilesMatch "\.(sql|log|env|ini|sh|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Headers de segurança
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
