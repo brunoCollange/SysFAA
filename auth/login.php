@@ -5,7 +5,7 @@ require_once __DIR__ . '/Auth.php';
 Auth::iniciarSessao();
 
 if (Auth::verificar()) {
-    header('Location: /SysFAA/dashboard.php');
+    header('Location: ' . BASE_URL . '/dashboard.php');
     exit;
 }
 
@@ -278,7 +278,7 @@ $msg  = $_GET['msg'] ?? '';
         <!-- Lateral decorativa -->
         <div class="login-lateral">
             <div>
-                <div class="logo-icon"><img src="/SysFAA/imgs/logoWhite.png"></i></div>
+                <div class="logo-icon"><img src="<?= BASE_URL ?>/imgs/logoWhite.png"></i></div>
                 <h1>SysFAA</h1>
                 <p>Sistema de Gestão de Fichas Hospitalares</p>
             </div>

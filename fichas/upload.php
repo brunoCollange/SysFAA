@@ -25,7 +25,7 @@ $tipos     = $db->query('SELECT id, nome, cor FROM tipos_ficha WHERE ativo = 1 O
 <?php if (empty($pacientes)): ?>
 <div class="alert alert-warning d-flex align-items-center gap-2" style="border-radius:10px;">
     <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
-    Nenhum paciente cadastrado. <a href="/SysFAA/pacientes/cadastrar.php" class="ms-1 fw-semibold">Cadastre um paciente</a> antes de fazer o upload.
+    Nenhum paciente cadastrado. <a href="<?= BASE_URL ?>/pacientes/cadastrar.php" class="ms-1 fw-semibold">Cadastre um paciente</a> antes de fazer o upload.
 </div>
 <?php else: ?>
 

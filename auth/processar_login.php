@@ -10,7 +10,7 @@ Auth::iniciarSessao();
 
 // Se já estiver logado, vai pro dashboard
 if (Auth::verificar()) {
-    header('Location: /SysFAA/dashboard.php');
+    header('Location: ' . BASE_URL . '/dashboard.php');
     exit;
 }
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $resultado = Auth::login($email, $senha, $lembrar);
         if ($resultado['ok']) {
-            header('Location: /SysFAA/dashboard.php');
+            header('Location: ' . BASE_URL . '/dashboard.php');
             exit;
         }
         $erro = $resultado['msg'];

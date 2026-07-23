@@ -22,6 +22,16 @@ define('ROOT_PATH',    dirname(__DIR__));
 define('UPLOAD_PATH',  ROOT_PATH . '/uploads/fichas/');
 define('UPLOAD_URL',   '/uploads/fichas/');
 
+// Caminho base do sistema na URL, detectado automaticamente a partir da
+// pasta real do projeto (evita depender de maiúsculas/minúsculas, que
+// diferem entre Windows/XAMPP e Linux). Ex.: "/SysFAA" ou "/sysfaa".
+$docRoot = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\'));
+$appRoot = str_replace('\\', '/', ROOT_PATH);
+define('BASE_URL', $docRoot && str_starts_with($appRoot, $docRoot)
+    ? substr($appRoot, strlen($docRoot))
+    : '');
+unset($docRoot, $appRoot);
+
 // Tamanho máximo de upload (bytes) — padrão 20 MB
 define('MAX_UPLOAD_SIZE', 20 * 1024 * 1024);
 

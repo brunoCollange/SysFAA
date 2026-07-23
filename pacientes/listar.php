@@ -154,7 +154,7 @@ $msgErro    = $_GET['erro'] ?? '';
                         </td>
                         <td class="text-center">
                             <?php if ($p['total_fichas'] > 0): ?>
-                            <a href="/SysFAA/fichas/listar.php?paciente_id=<?= $p['id'] ?>"
+                            <a href="<?= BASE_URL ?>/fichas/listar.php?paciente_id=<?= $p['id'] ?>"
                                class="badge text-decoration-none"
                                onclick="event.stopPropagation()"
                                style="background:#e8f1fb;color:#1a56a0;border-radius:20px;padding:4px 10px;font-size:.8rem;font-weight:600;">
@@ -322,7 +322,7 @@ function abrirModalPaciente(tr) {
         : 'Nenhuma ficha';
 
     document.getElementById('pacienteModalCadastro').textContent = d.cadastro;
-    document.getElementById('pacienteModalVerFichas').href = '/SysFAA/fichas/listar.php?paciente_id=' + d.id;
+    document.getElementById('pacienteModalVerFichas').href = '<?= BASE_URL ?>/fichas/listar.php?paciente_id=' + d.id;
 
     const btnEditar = document.getElementById('pacienteModalEditar');
     if (btnEditar) btnEditar.href = 'editar.php?id=' + d.id;

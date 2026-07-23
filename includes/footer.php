@@ -102,7 +102,7 @@ function enviarAlterarSenha() {
     dados.append('nova_senha', novaSenha);
     dados.append('confirmar_senha', confirmar);
 
-    fetch('/SysFAA/auth/alterar_senha.php', { method: 'POST', body: dados })
+    fetch('<?= BASE_URL ?>/auth/alterar_senha.php', { method: 'POST', body: dados })
         .then(r => r.json())
         .then(resp => {
             if (resp.sucesso) {

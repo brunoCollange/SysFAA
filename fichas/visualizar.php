@@ -8,7 +8,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/Auth.php';
 
 Auth::iniciarSessao();
-Auth::exigirLogin('/SysFAA/auth/login.php');
+Auth::exigirLogin();
 
 $db = Database::get();
 $id = (int)($_GET['id'] ?? 0);

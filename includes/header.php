@@ -8,7 +8,7 @@
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../auth/Auth.php';
-Auth::exigirLogin('/SysFAA/auth/login.php');
+Auth::exigirLogin();
 
 $usuario = Auth::usuario();
 $paginaTitulo = $paginaTitulo ?? 'SysFAA';
@@ -217,29 +217,29 @@ $paginaAtiva  = $paginaAtiva  ?? '';
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <div class="logo-icon"><img src="/SysFAA/imgs/logoWhite.png" style="width:80px;object-fit:contain;"></div>
+        <div class="logo-icon"><img src="<?= BASE_URL ?>/imgs/logoWhite.png" style="width:80px;object-fit:contain;"></div>
         <span>SysFAA</span>
     </div>
 
     <ul class="sidebar-menu">
         <li class="menu-section">Principal</li>
         <li>
-            <a href="/SysFAA/dashboard.php" class="<?= $paginaAtiva === 'dashboard' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/dashboard.php" class="<?= $paginaAtiva === 'dashboard' ? 'ativo' : '' ?>">
                 <i class="bi bi-grid-1x2"></i> Dashboard
             </a>
         </li>
         <li>
-            <a href="/SysFAA/fichas/listar.php" class="<?= $paginaAtiva === 'fichas' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/fichas/listar.php" class="<?= $paginaAtiva === 'fichas' ? 'ativo' : '' ?>">
                 <i class="bi bi-file-earmark-medical"></i> Fichas
             </a>
         </li>
         <li>
-            <a href="/SysFAA/pacientes/listar.php" class="<?= $paginaAtiva === 'pacientes' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/pacientes/listar.php" class="<?= $paginaAtiva === 'pacientes' ? 'ativo' : '' ?>">
                 <i class="bi bi-person-vcard"></i> Pacientes
             </a>
         </li>
         <li>
-            <a href="/SysFAA/fichas/upload.php" class="<?= $paginaAtiva === 'upload' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/fichas/upload.php" class="<?= $paginaAtiva === 'upload' ? 'ativo' : '' ?>">
                 <i class="bi bi-cloud-upload"></i> Upload de Ficha
             </a>
         </li>
@@ -247,17 +247,17 @@ $paginaAtiva  = $paginaAtiva  ?? '';
         <?php if (Auth::temPermissao('admin')): ?>
         <li class="menu-section">Administração</li>
         <li>
-            <a href="/SysFAA/admin/usuarios.php" class="<?= $paginaAtiva === 'usuarios' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/admin/usuarios.php" class="<?= $paginaAtiva === 'usuarios' ? 'ativo' : '' ?>">
                 <i class="bi bi-people"></i> Usuários
             </a>
         </li>
         <li>
-            <a href="/SysFAA/admin/tipos_ficha.php" class="<?= $paginaAtiva === 'tipos' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/admin/tipos_ficha.php" class="<?= $paginaAtiva === 'tipos' ? 'ativo' : '' ?>">
                 <i class="bi bi-tags"></i> Tipos de Ficha
             </a>
         </li>
         <li>
-            <a href="/SysFAA/admin/auditoria.php" class="<?= $paginaAtiva === 'auditoria' ? 'ativo' : '' ?>">
+            <a href="<?= BASE_URL ?>/admin/auditoria.php" class="<?= $paginaAtiva === 'auditoria' ? 'ativo' : '' ?>">
                 <i class="bi bi-journal-text"></i> Auditoria
             </a>
         </li>
@@ -297,7 +297,7 @@ $paginaAtiva  = $paginaAtiva  ?? '';
                         </button>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" style="border-radius:6px;" href="/SysFAA/auth/logout.php">
+                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" style="border-radius:6px;" href="<?= BASE_URL ?>/auth/logout.php">
                             <i class="bi bi-box-arrow-right"></i> Sair
                         </a>
                     </li>

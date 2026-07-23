@@ -8,8 +8,9 @@ ServerSignature Off
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Detecta automaticamente o caminho base (funciona em subpasta)
-    RewriteBase /SysFAA/
+    # Sem RewriteBase fixo: o Apache usa a pasta física do .htaccess como
+    # base automaticamente, então funciona igual em qualquer nome/maiúsculas
+    # de pasta (ex.: /SysFAA no Windows, /sysfaa no Linux).
 
     # Bloqueia acesso direto à pasta de uploads
     RewriteRule ^uploads/ - [F,L]

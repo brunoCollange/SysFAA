@@ -129,7 +129,7 @@ class Auth
     // --------------------------------------------------------
     // Redireciona se não autenticado
     // --------------------------------------------------------
-    public static function exigirLogin(string $redirect = '/SysFAA/auth/login.php'): void
+    public static function exigirLogin(string $redirect = BASE_URL . '/auth/login.php'): void
     {
         if (!self::verificar()) {
             header('Location: ' . $redirect);

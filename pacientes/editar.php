@@ -111,7 +111,7 @@ $qtdFichas = $totalFichas->fetchColumn();
              style="background:#e8f1fb;border-radius:10px;font-size:.85rem;color:#1a56a0;">
             <i class="bi bi-info-circle-fill flex-shrink-0"></i>
             Este paciente possui <strong><?= $qtdFichas ?> ficha<?= $qtdFichas > 1 ? 's' : '' ?></strong> vinculada<?= $qtdFichas > 1 ? 's' : '' ?>.
-            <a href="/SysFAA/fichas/listar.php?paciente_id=<?= $id ?>" style="color:#1a56a0;font-weight:600;">Ver fichas →</a>
+            <a href="<?= BASE_URL ?>/fichas/listar.php?paciente_id=<?= $id ?>" style="color:#1a56a0;font-weight:600;">Ver fichas →</a>
         </div>
         <?php endif; ?>
 

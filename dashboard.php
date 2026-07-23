@@ -69,7 +69,7 @@ $porTipo = $db->query(
         <div class="card border-0 shadow-sm" style="border-radius:12px;">
             <div class="card-header bg-white pt-4 pb-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom:1px solid #eef1f7;">
                 <h6 class="mb-0" style="font-family:'Sora',sans-serif;font-weight:700;">Fichas Recentes</h6>
-                <a href="/SysFAA/fichas/listar.php" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" style="border-radius:8px;font-size:.8rem;">
+                <a href="<?= BASE_URL ?>/fichas/listar.php" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" style="border-radius:8px;font-size:.8rem;">
                     Ver todas <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -92,9 +92,9 @@ $porTipo = $db->query(
                             </thead>
                             <tbody>
                                 <?php foreach ($ultimasFichas as $f): ?>
-                                    <tr style="cursor:pointer;" onclick="window.open('/SysFAA/fichas/visualizar.php?id=<?= $f['id'] ?>', '_blank')">
+                                    <tr style="cursor:pointer;" onclick="window.open('<?= BASE_URL ?>/fichas/visualizar.php?id=<?= $f['id'] ?>', '_blank')">
                                         <td class="ps-4">
-                                            <a href="/SysFAA/fichas/listar.php?paciente_id=<?= $f['pac_id'] ?>"
+                                            <a href="<?= BASE_URL ?>/fichas/listar.php?paciente_id=<?= $f['pac_id'] ?>"
                                                onclick="event.stopPropagation()"
                                                style="color:#1a56a0;text-decoration:none;font-weight:500;">
                                                 <?= htmlspecialchars($f['paciente']) ?>
