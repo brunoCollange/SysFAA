@@ -105,7 +105,7 @@ Use as credenciais padrão para entrar pela primeira vez:
 | E-mail | `admin@gmail.com` |
 | Senha | `admin` |
 
-> Troque a senha imediatamente após o primeiro login.
+> Troque a senha imediatamente após o primeiro login. Isso pode ser feito a qualquer momento pelo menu do usuário, no canto superior direito de qualquer tela (**nome do usuário → Alterar Senha**).
 
 ---
 
@@ -116,6 +116,20 @@ Use as credenciais padrão para entrar pela primeira vez:
 | `admin` | Acesso total + painel de administração, usuários e auditoria |
 | `administracao` | Gerencia pacientes e fichas (criar, editar, excluir, upload) |
 | `recepcao` | Apenas visualiza e faz download de fichas |
+
+---
+
+## Funcionalidades
+
+- **Dashboard**: cartões de resumo (fichas, pacientes, uploads do dia, usuários online), lista das fichas mais recentes e gráfico de distribuição por tipo de ficha.
+- **Pacientes**: cadastro, edição e listagem com busca por nome. Clicar em um paciente abre um modal com os dados completos e ações (ver fichas, editar, excluir).
+- **Fichas**: upload de PDFs vinculados a um paciente e tipo, com filtros por paciente, tipo e período. Clicar em uma ficha abre um modal com detalhes e ações (abrir PDF, baixar, excluir).
+- **Tipos de Ficha**: cadastro de categorias de ficha com cor identificadora, usada em badges por todo o sistema.
+- **Usuários** *(admin)*: criação e edição de contas, ativação/desativação e definição de perfil de acesso.
+- **Auditoria** *(admin)*: histórico de ações do sistema (login, uploads, exclusões, alterações), com filtros por usuário, ação e período.
+- **Menu do usuário**: no canto superior direito, permite alterar a própria senha (modal, sem recarregar a página) e sair do sistema.
+
+Todas as telas de listagem seguem o mesmo padrão visual: barra de busca/filtro integrada ao card da tabela, linhas clicáveis que abrem um modal de detalhes (em vez de colunas de ações com ícones), e contagem de registros exibida abaixo do card.
 
 ---
 
@@ -135,7 +149,8 @@ SysFAA/
 │   ├── Auth.php                  ← Classe de autenticação e sessão
 │   ├── login.php                 ← Tela de login
 │   ├── processar_login.php       ← Processa POST do login
-│   └── logout.php                ← Encerra sessão
+│   ├── logout.php                ← Encerra sessão
+│   └── alterar_senha.php         ← Endpoint (AJAX/JSON) para troca da própria senha
 │
 ├── admin/
 │   ├── usuarios.php              ← Gerenciamento de usuários
@@ -159,8 +174,8 @@ SysFAA/
 │   └── excluir.php               ← Exclusão de ficha
 │
 ├── includes/
-│   ├── header.php                ← Navbar e sidebar reutilizáveis
-│   └── footer.php                ← Rodapé reutilizável
+│   ├── header.php                ← Navbar, sidebar e menu do usuário (reutilizáveis)
+│   └── footer.php                ← Rodapé + modal de alteração de senha (reutilizáveis)
 │
 ├── imgs/
 │   └── logoWhite.png             ← Logo do sistema

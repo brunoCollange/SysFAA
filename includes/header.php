@@ -265,10 +265,7 @@ $paginaAtiva  = $paginaAtiva  ?? '';
     </ul>
 
     <div class="sidebar-footer">
-        <strong><?= htmlspecialchars($usuario['nome']) ?></strong>
-        <?= ucfirst($usuario['perfil']) ?>
-        &nbsp;·&nbsp; <a href="/SysFAA/auth/logout.php" style="color:rgba(255,255,255,.55);">Sair</a><br>
-        <b>Developed by Bruno Collange <br>&copy; Colliveir - 2026</b>
+        <b>Develop by <a href="https://www.colliveir.com.br/" target="_blank" rel="noopener" style="color:inherit;">Colliveir</a> <br>&copy; Colliveir - 2026</b>
     </div>
 </nav>
 
@@ -283,13 +280,29 @@ $paginaAtiva  = $paginaAtiva  ?? '';
             <h6><?= htmlspecialchars($paginaTitulo) ?></h6>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <span class="text-muted d-none d-md-inline" style="font-size:.82rem;">
-                <i class="bi bi-person-circle me-1"></i>
-                <?= htmlspecialchars($usuario['nome']) ?>
-            </span>
-            <a href="/SysFAA/auth/logout.php" class="btn btn-sm btn-outline-secondary" title="Sair">
-                <i class="bi bi-box-arrow-right"></i>
-            </a>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:8px;">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="d-none d-md-inline"><?= htmlspecialchars($usuario['nome']) ?></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius:10px;border:none;min-width:210px;padding:8px;">
+                    <li class="px-2 py-1">
+                        <div style="font-weight:600;color:#1e2d45;font-size:.88rem;"><?= htmlspecialchars($usuario['nome']) ?></div>
+                        <div class="text-muted" style="font-size:.78rem;"><?= ucfirst($usuario['perfil']) ?></div>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button class="dropdown-item d-flex align-items-center gap-2" type="button" style="border-radius:6px;" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
+                            <i class="bi bi-shield-lock"></i> Alterar Senha
+                        </button>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" style="border-radius:6px;" href="/SysFAA/auth/logout.php">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="page-body">

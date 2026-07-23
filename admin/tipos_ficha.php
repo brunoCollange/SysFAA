@@ -14,7 +14,7 @@ $msgOk = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
     $tid  = (int)($_POST['id'] ?? 0);
-    $nome = trim($_POST['nome'] ?? '');
+    $nome = mb_strtoupper(trim($_POST['nome'] ?? ''), 'UTF-8');
     $cor  = trim($_POST['cor']  ?? '#0d6efd');
 
     if ($acao === 'criar' || $acao === 'editar') {
@@ -81,18 +81,6 @@ $paginaAtiva  = 'tipos';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h4 class="mb-1" style="font-family:'Sora',sans-serif;font-weight:700;">Tipos de Ficha</h4>
-        <p class="text-muted mb-0" style="font-size:.88rem;"><?= count($tipos) ?> tipo(s) cadastrado(s)</p>
-    </div>
-    <button class="btn btn-primary d-flex align-items-center gap-2"
-            style="border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;"
-            onclick="abrirModal()">
-        <i class="bi bi-plus-lg"></i> Novo Tipo
-    </button>
-</div>
-
 <?php if ($msgOk): ?>
 <div class="alert alert-success d-flex align-items-center gap-2 mb-3" style="border-radius:10px;font-size:.88rem;">
     <i class="bi bi-check-circle-fill"></i><?= htmlspecialchars($msgOk) ?>
@@ -106,20 +94,57 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="card border-0 shadow-sm" style="border-radius:12px;">
     <div class="card-body p-0">
+
+        <!-- Barra de busca e ações -->
+        <div class="d-flex align-items-center gap-3 flex-wrap p-3" style="border-bottom:1px solid #eef1f7;">
+            <div style="flex:1 1 320px;max-width:420px;">
+                <div class="input-group">
+                    <span class="input-group-text border-0" style="background:#f4f6fb;border-radius:8px 0 0 8px;">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input
+                        type="text"
+                        id="buscaTipo"
+                        class="form-control border-0"
+                        placeholder="Buscar por nome..."
+                        style="background:#f4f6fb;border-radius:0 8px 8px 0;"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+            <a href="#" id="limparFiltrosTipo" class="text-decoration-none" style="font-size:.85rem;color:#c3cbdb;pointer-events:none;">Limpar filtros</a>
+            <button type="button" class="btn btn-primary d-flex align-items-center gap-2 ms-auto"
+                    style="border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;white-space:nowrap;"
+                    onclick="abrirModal()">
+                <i class="bi bi-plus-lg"></i> Nova Ficha
+            </button>
+        </div>
+
+        <?php if (empty($tipos)): ?>
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-tags d-block mb-2" style="font-size:2.5rem;"></i>
+            Nenhum tipo de ficha cadastrado ainda.
+        </div>
+        <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" style="font-size:.87rem;">
                 <thead>
-                    <tr style="background:#f8fafd;color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
-                        <th class="border-0 ps-4 py-3">Tipo</th>
-                        <th class="border-0 py-3">Cor</th>
-                        <th class="border-0 py-3 text-center">Fichas</th>
-                        <th class="border-0 py-3">Status</th>
-                        <th class="border-0 py-3 pe-4 text-end">Ações</th>
+                    <tr style="color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
+                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Tipo</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Cor</th>
+                        <th class="border-0 py-3 text-center" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Fichas</th>
+                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="corpoTabelaTipos">
                 <?php foreach ($tipos as $t): ?>
-                <tr style="<?= !$t['ativo'] ? 'opacity:.55;' : '' ?>">
+                <tr style="cursor:pointer;<?= !$t['ativo'] ? 'opacity:.55;' : '' ?>"
+                    onclick="abrirModalDetalhesTipo(this)"
+                    data-id="<?= $t['id'] ?>"
+                    data-nome="<?= htmlspecialchars($t['nome'], ENT_QUOTES) ?>"
+                    data-cor="<?= $t['cor'] ?>"
+                    data-fichas="<?= (int)$t['total_fichas'] ?>"
+                    data-ativo="<?= $t['ativo'] ? '1' : '0' ?>">
                     <td class="ps-4">
                         <div class="d-flex align-items-center gap-2">
                             <div style="width:14px;height:14px;border-radius:50%;background:<?= $t['cor'] ?>;flex-shrink:0;"></div>
@@ -134,49 +159,81 @@ require_once __DIR__ . '/../includes/header.php';
                             <?= $t['total_fichas'] ?>
                         </span>
                     </td>
-                    <td>
+                    <td class="pe-4">
                         <?php if ($t['ativo']): ?>
                         <span class="badge" style="background:#e9f7ef;color:#198754;border-radius:6px;padding:4px 9px;font-size:.78rem;">Ativo</span>
                         <?php else: ?>
                         <span class="badge" style="background:#f8f9fa;color:#6c757d;border-radius:6px;padding:4px 9px;font-size:.78rem;">Inativo</span>
                         <?php endif; ?>
                     </td>
-                    <td class="pe-4 text-end">
-                        <div class="d-flex gap-1 justify-content-end">
-                            <button type="button" class="btn btn-sm btn-outline-secondary"
-                                    style="border-radius:6px;font-size:.78rem;" title="Editar"
-                                    onclick="abrirModal(<?= $t['id'] ?>, '<?= htmlspecialchars(addslashes($t['nome'])) ?>', '<?= $t['cor'] ?>')">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="acao" value="toggle">
-                                <input type="hidden" name="id" value="<?= $t['id'] ?>">
-                                <button type="submit" class="btn btn-sm <?= $t['ativo'] ? 'btn-outline-warning' : 'btn-outline-success' ?>"
-                                        style="border-radius:6px;font-size:.78rem;"
-                                        title="<?= $t['ativo'] ? 'Desativar' : 'Ativar' ?>">
-                                    <i class="bi <?= $t['ativo'] ? 'bi-toggle-on' : 'bi-toggle-off' ?>"></i>
-                                </button>
-                            </form>
-                            <?php if ($t['total_fichas'] == 0): ?>
-                            <form method="POST" style="display:inline;"
-                                  onsubmit="return confirm('Excluir tipo <?= addslashes($t['nome']) ?>?')">
-                                <input type="hidden" name="acao" value="excluir">
-                                <input type="hidden" name="id" value="<?= $t['id'] ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        style="border-radius:6px;font-size:.78rem;" title="Excluir">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
-                        </div>
-                    </td>
                 </tr>
                 <?php endforeach; ?>
+                <tr id="tipoSemResultado" style="display:none;">
+                    <td colspan="4" class="text-center text-muted py-4">Nenhum tipo encontrado.</td>
+                </tr>
                 </tbody>
             </table>
         </div>
+        <?php endif; ?>
     </div>
 </div>
+
+<!-- Rodapé: contagem, fora do card -->
+<?php if (!empty($tipos)): ?>
+<p class="text-muted mt-2 mb-0 ps-1" style="font-size:.84rem;">
+    <span id="tipoContagem"><?= count($tipos) ?></span> registro<span id="tipoContagemPlural"><?= count($tipos) !== 1 ? 's' : '' ?></span> encontrado<span id="tipoContagemPlural2"><?= count($tipos) !== 1 ? 's' : '' ?></span>
+</p>
+<?php endif; ?>
+
+<!-- Modal de detalhes do tipo -->
+<div class="modal fade" id="modalDetalhesTipo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;overflow:hidden;">
+            <div class="position-relative p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
+                <button type="button" class="btn-close btn-close-white position-absolute" style="top:18px;right:18px;" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                <div class="d-flex align-items-center gap-3">
+                    <div id="tipoModalAvatar" style="width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+                    <div>
+                        <h5 id="tipoModalNome" class="mb-1" style="font-family:'Sora',sans-serif;font-weight:700;"></h5>
+                        <span id="tipoModalStatus" class="badge" style="font-weight:500;font-size:.75rem;"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-6">
+                        <div class="text-muted mb-1" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;">Cor identificadora</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span id="tipoModalCorDot" style="width:14px;height:14px;border-radius:50%;flex-shrink:0;"></span>
+                            <span id="tipoModalCor" style="font-family:monospace;font-weight:500;color:#1e2d45;font-size:.92rem;"></span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted mb-1" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;">Fichas vinculadas</div>
+                        <div id="tipoModalFichas" style="font-weight:500;color:#1e2d45;font-size:.92rem;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 p-4 pt-0 d-flex flex-column gap-2">
+                <a id="tipoModalEditar" href="#" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;">
+                    <i class="bi bi-pencil"></i> Editar Tipo
+                </a>
+                <button type="button" id="tipoModalToggle" class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;"></button>
+                <button type="button" id="tipoModalExcluir" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;">
+                    <i class="bi bi-trash"></i> Excluir Tipo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulário oculto para ações de ativar/desativar/excluir -->
+<form method="POST" id="formAcaoTipo" style="display:none;">
+    <input type="hidden" name="acao" id="formAcaoTipoAcao">
+    <input type="hidden" name="id" id="formAcaoTipoId">
+</form>
 
 <!-- Modal criar/editar -->
 <div class="modal fade" id="modalTipo" tabindex="-1">
@@ -191,7 +248,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="mb-3">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">Nome <span class="text-danger">*</span></label>
                         <input type="text" id="modalNome" name="nome" class="form-control"
-                               style="border-radius:8px;border-color:#d1dff0;"
+                               style="border-radius:8px;border-color:#d1dff0;text-transform:uppercase;"
                                placeholder="Ex.: Internação" maxlength="100" required>
                     </div>
 
@@ -204,10 +261,12 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-secondary flex-fill" style="border-radius:8px;" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary flex-fill" style="border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;">Salvar</button>
-                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-outline-secondary px-4" style="border-radius:8px;" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success px-4" style="border-radius:8px;font-weight:600;">
+                        <i class="bi bi-floppy me-2"></i>Salvar
+                    </button>
                 </div>
             </form>
         </div>
@@ -217,12 +276,82 @@ require_once __DIR__ . '/../includes/header.php';
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
 <script>
-var modalEl;
+var modalEl, modalDetalhesEl;
+var tipoAtual = null;
+var tipoAcaoPendente = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-    modalEl = new bootstrap.Modal(document.getElementById('modalTipo'));
+    modalEl         = new bootstrap.Modal(document.getElementById('modalTipo'));
+    modalDetalhesEl = new bootstrap.Modal(document.getElementById('modalDetalhesTipo'));
 
     document.getElementById('modalCor').addEventListener('input', function() {
         document.getElementById('modalCorHex').textContent = this.value;
+    });
+
+    // Busca ao vivo (filtra a tabela já carregada, sem recarregar a página)
+    const buscaTipo   = document.getElementById('buscaTipo');
+    const linhasTipo  = Array.from(document.querySelectorAll('#corpoTabelaTipos tr[data-nome]'));
+    const semResTipo  = document.getElementById('tipoSemResultado');
+    const limparTipo  = document.getElementById('limparFiltrosTipo');
+
+    function filtrarTipos() {
+        const termo = buscaTipo.value.trim().toLowerCase();
+        let visiveis = 0;
+
+        linhasTipo.forEach(function(tr) {
+            const bate = tr.dataset.nome.toLowerCase().includes(termo);
+            tr.style.display = bate ? '' : 'none';
+            if (bate) visiveis++;
+        });
+
+        semResTipo.style.display = visiveis === 0 ? '' : 'none';
+
+        document.getElementById('tipoContagem').textContent       = visiveis;
+        document.getElementById('tipoContagemPlural').textContent  = visiveis !== 1 ? 's' : '';
+        document.getElementById('tipoContagemPlural2').textContent = visiveis !== 1 ? 's' : '';
+
+        if (termo) {
+            limparTipo.style.color = '#7a8aaa';
+            limparTipo.style.pointerEvents = 'auto';
+        } else {
+            limparTipo.style.color = '#c3cbdb';
+            limparTipo.style.pointerEvents = 'none';
+        }
+    }
+
+    buscaTipo.addEventListener('input', filtrarTipos);
+    limparTipo.addEventListener('click', function(e) {
+        e.preventDefault();
+        buscaTipo.value = '';
+        filtrarTipos();
+        buscaTipo.focus();
+    });
+
+    document.getElementById('tipoModalEditar').addEventListener('click', function(e) {
+        e.preventDefault();
+        tipoAcaoPendente = () => abrirModal(tipoAtual.id, tipoAtual.nome, tipoAtual.cor);
+        modalDetalhesEl.hide();
+    });
+
+    document.getElementById('tipoModalToggle').addEventListener('click', function() {
+        document.getElementById('formAcaoTipoAcao').value = 'toggle';
+        document.getElementById('formAcaoTipoId').value   = tipoAtual.id;
+        document.getElementById('formAcaoTipo').submit();
+    });
+
+    document.getElementById('tipoModalExcluir').addEventListener('click', function() {
+        if (!confirm('Excluir tipo ' + tipoAtual.nome + '?')) return;
+        document.getElementById('formAcaoTipoAcao').value = 'excluir';
+        document.getElementById('formAcaoTipoId').value   = tipoAtual.id;
+        document.getElementById('formAcaoTipo').submit();
+    });
+
+    document.getElementById('modalDetalhesTipo').addEventListener('hidden.bs.modal', function() {
+        if (tipoAcaoPendente) {
+            const acao = tipoAcaoPendente;
+            tipoAcaoPendente = null;
+            acao();
+        }
     });
 });
 
@@ -238,5 +367,34 @@ function abrirModal(id, nome, cor) {
     document.getElementById('modalCorHex').textContent  = cor;
     document.getElementById('modalTitulo').textContent  = id ? 'Editar Tipo de Ficha' : 'Novo Tipo de Ficha';
     modalEl.show();
+}
+
+function abrirModalDetalhesTipo(tr) {
+    const d = tr.dataset;
+    tipoAtual = { id: d.id, nome: d.nome, cor: d.cor };
+
+    document.getElementById('tipoModalAvatar').style.background = d.cor;
+    document.getElementById('tipoModalNome').textContent = d.nome;
+    document.getElementById('tipoModalCorDot').style.background = d.cor;
+    document.getElementById('tipoModalCor').textContent = d.cor;
+    document.getElementById('tipoModalFichas').textContent = d.fichas + ' ficha' + (d.fichas != 1 ? 's' : '');
+
+    const ativo  = d.ativo === '1';
+    const status = document.getElementById('tipoModalStatus');
+    status.textContent    = ativo ? 'Ativo' : 'Inativo';
+    status.style.background = ativo ? 'rgba(61,220,132,.2)' : 'rgba(255,255,255,.18)';
+    status.style.color      = '#fff';
+
+    const btnToggle = document.getElementById('tipoModalToggle');
+    btnToggle.className = 'btn w-100 d-flex align-items-center justify-content-center gap-2 ' +
+        (ativo ? 'btn-outline-warning' : 'btn-outline-success');
+    btnToggle.innerHTML = ativo
+        ? '<i class="bi bi-toggle-off"></i> Desativar Tipo'
+        : '<i class="bi bi-toggle-on"></i> Ativar Tipo';
+
+    const btnExcluir = document.getElementById('tipoModalExcluir');
+    btnExcluir.style.display = (parseInt(d.fichas, 10) === 0) ? '' : 'none';
+
+    modalDetalhesEl.show();
 }
 </script>

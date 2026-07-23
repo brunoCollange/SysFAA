@@ -80,25 +80,23 @@ function corAcao(string $acao): array {
         'tipo_criado'       => ['#e9f7ef','#198754','bi-tags'],
         'tipo_editado'      => ['#e8f1fb','#1a56a0','bi-tag'],
         'tipo_excluido'     => ['#fff2f2','#dc3545','bi-trash'],
+        'senha_alterada'    => ['#e8f1fb','#1a56a0','bi-shield-lock'],
     ];
     return $mapa[$acao] ?? ['#f8f9fa','#6c757d','bi-activity'];
 }
 ?>
 
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h4 class="mb-1" style="font-family:'Sora',sans-serif;font-weight:700;">Log de Auditoria</h4>
-        <p class="text-muted mb-0" style="font-size:.88rem;"><?= number_format($total,0,',','.') ?> registro(s) encontrado(s)</p>
-    </div>
-</div>
+<!-- Tabela -->
+<div class="card border-0 shadow-sm" style="border-radius:12px;">
+    <div class="card-body p-0">
 
-<!-- Filtros -->
-<div class="card border-0 shadow-sm mb-3" style="border-radius:12px;">
-    <div class="card-body p-3">
-        <form method="GET" class="row g-2 align-items-end">
-            <div class="col-12 col-md-3">
-                <label class="form-label mb-1" style="font-size:.78rem;font-weight:500;color:#7a8aaa;">USUÁRIO</label>
-                <select name="usuario_id" class="form-select form-select-sm" style="border-radius:7px;border-color:#d1dff0;">
+        <!-- Barra de filtros -->
+        <form method="GET">
+        <div class="d-flex align-items-end gap-3 flex-wrap p-3" style="border-bottom:1px solid #eef1f7;">
+
+            <div style="flex:1 1 220px;max-width:280px;">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Usuário</label>
+                <select name="usuario_id" class="form-select" style="background:#f4f6fb;border:none;border-radius:8px;">
                     <option value="">Todos</option>
                     <?php foreach ($usuarios as $u): ?>
                     <option value="<?= $u['id'] ?>" <?= $filtroUsuario == $u['id'] ? 'selected':'' ?>>
@@ -107,40 +105,41 @@ function corAcao(string $acao): array {
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-12 col-md-2">
-                <label class="form-label mb-1" style="font-size:.78rem;font-weight:500;color:#7a8aaa;">AÇÃO</label>
-                <select name="acao" class="form-select form-select-sm" style="border-radius:7px;border-color:#d1dff0;">
+
+            <div style="flex:1 1 180px;max-width:220px;">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Ação</label>
+                <select name="acao" class="form-select" style="background:#f4f6fb;border:none;border-radius:8px;">
                     <option value="">Todas</option>
                     <?php foreach ($acoes as $a): ?>
                     <option value="<?= $a ?>" <?= $filtroAcao === $a ? 'selected':'' ?>><?= $a ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label mb-1" style="font-size:.78rem;font-weight:500;color:#7a8aaa;">DATA DE</label>
-                <input type="date" name="data_de" class="form-control form-control-sm"
-                       value="<?= htmlspecialchars($filtroDataDe) ?>" style="border-radius:7px;border-color:#d1dff0;">
-            </div>
-            <div class="col-6 col-md-2">
-                <label class="form-label mb-1" style="font-size:.78rem;font-weight:500;color:#7a8aaa;">DATA ATÉ</label>
-                <input type="date" name="data_ate" class="form-control form-control-sm"
-                       value="<?= htmlspecialchars($filtroDataAte) ?>" style="border-radius:7px;border-color:#d1dff0;">
-            </div>
-            <div class="col-12 col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-sm px-3 flex-fill" style="border-radius:7px;">
-                    <i class="bi bi-funnel me-1"></i>Filtrar
-                </button>
-                <a href="auditoria.php" class="btn btn-outline-secondary btn-sm px-3" style="border-radius:7px;" title="Limpar">
-                    <i class="bi bi-x-lg"></i>
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- Tabela -->
-<div class="card border-0 shadow-sm" style="border-radius:12px;">
-    <div class="card-body p-0">
+            <div style="flex:0 1 150px;">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Data de</label>
+                <input type="date" name="data_de" class="form-control"
+                       value="<?= htmlspecialchars($filtroDataDe) ?>" style="background:#f4f6fb;border:none;border-radius:8px;">
+            </div>
+
+            <div style="flex:0 1 150px;">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Data até</label>
+                <input type="date" name="data_ate" class="form-control"
+                       value="<?= htmlspecialchars($filtroDataAte) ?>" style="background:#f4f6fb;border:none;border-radius:8px;">
+            </div>
+
+            <button type="submit" class="btn btn-outline-secondary d-flex align-items-center gap-2" style="border-radius:8px;">
+                <i class="bi bi-funnel"></i> Filtrar
+            </button>
+
+            <?php if ($filtroUsuario || $filtroAcao || $filtroDataDe || $filtroDataAte): ?>
+            <a href="auditoria.php" class="text-decoration-none" style="font-size:.85rem;color:#7a8aaa;">Limpar filtros</a>
+            <?php else: ?>
+            <span style="font-size:.85rem;color:#c3cbdb;">Limpar filtros</span>
+            <?php endif; ?>
+        </div>
+        </form>
+
         <?php if (empty($logs)): ?>
         <div class="text-center py-5 text-muted">
             <i class="bi bi-journal-x d-block mb-2" style="font-size:2.5rem;opacity:.4;"></i>
@@ -150,12 +149,12 @@ function corAcao(string $acao): array {
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
                 <thead>
-                    <tr style="background:#f8fafd;color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
-                        <th class="border-0 ps-4 py-3">Data/Hora</th>
-                        <th class="border-0 py-3">Ação</th>
-                        <th class="border-0 py-3">Usuário</th>
-                        <th class="border-0 py-3">Descrição</th>
-                        <th class="border-0 py-3 pe-4">IP</th>
+                    <tr style="color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
+                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Data/Hora</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Ação</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Usuário</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Descrição</th>
+                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">IP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -188,36 +187,38 @@ function corAcao(string $acao): array {
                 </tbody>
             </table>
         </div>
-
-        <!-- Paginação -->
-        <?php if ($totalPaginas > 1):
-            $qb = http_build_query(array_filter([
-                'usuario_id' => $filtroUsuario ?: null,
-                'acao'       => $filtroAcao    ?: null,
-                'data_de'    => $filtroDataDe  ?: null,
-                'data_ate'   => $filtroDataAte ?: null,
-            ]));
-        ?>
-        <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top" style="font-size:.84rem;">
-            <span class="text-muted">
-                Mostrando <?= $offset+1 ?>–<?= min($offset+$porPagina,$total) ?> de <?= $total ?>
-            </span>
-            <nav>
-                <ul class="pagination pagination-sm mb-0 gap-1">
-                    <?php for ($pg=1;$pg<=$totalPaginas;$pg++): ?>
-                    <li class="page-item <?= $pg===$pagina?'active':'' ?>">
-                        <a class="page-link" href="?p=<?= $pg ?>&<?= $qb ?>"
-                           style="border-radius:6px;<?= $pg===$pagina?'background:#1a56a0;border-color:#1a56a0;':'' ?>">
-                            <?= $pg ?>
-                        </a>
-                    </li>
-                    <?php endfor; ?>
-                </ul>
-            </nav>
-        </div>
-        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Rodapé: contagem e paginação, fora do card -->
+<?php if (!empty($logs)):
+    $qb = http_build_query(array_filter([
+        'usuario_id' => $filtroUsuario ?: null,
+        'acao'       => $filtroAcao    ?: null,
+        'data_de'    => $filtroDataDe  ?: null,
+        'data_ate'   => $filtroDataAte ?: null,
+    ]));
+?>
+<div class="d-flex align-items-center justify-content-between mt-2 px-1" style="font-size:.84rem;">
+    <span class="text-muted">
+        <?= number_format($total, 0, ',', '.') ?> registro<?= $total !== 1 ? 's' : '' ?> encontrado<?= $total !== 1 ? 's' : '' ?>
+    </span>
+    <?php if ($totalPaginas > 1): ?>
+    <nav>
+        <ul class="pagination pagination-sm mb-0 gap-1">
+            <?php for ($pg=1;$pg<=$totalPaginas;$pg++): ?>
+            <li class="page-item <?= $pg===$pagina?'active':'' ?>">
+                <a class="page-link" href="?p=<?= $pg ?>&<?= $qb ?>"
+                   style="border-radius:6px;<?= $pg===$pagina?'background:#1a56a0;border-color:#1a56a0;':'' ?>">
+                    <?= $pg ?>
+                </a>
+            </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

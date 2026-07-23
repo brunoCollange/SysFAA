@@ -15,7 +15,7 @@ $fichasHoje     = $db->query("SELECT COUNT(*) FROM fichas WHERE DATE(criado_em) 
 // Últimas fichas
 $ultimasFichas = $db->query(
     'SELECT f.id, f.nome_original, f.criado_em, f.data_ficha,
-            p.nome AS paciente, t.nome AS tipo, t.cor
+            p.id AS pac_id, p.nome AS paciente, t.nome AS tipo, t.cor
      FROM fichas f
      JOIN pacientes p ON p.id = f.paciente_id
      JOIN tipos_ficha t ON t.id = f.tipo_ficha_id
@@ -67,15 +67,15 @@ $porTipo = $db->query(
     <!-- Tabela: últimas fichas -->
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm" style="border-radius:12px;">
-            <div class="card-header bg-white border-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0" style="font-family:'Sora',sans-serif;font-weight:600;">Fichas Recentes</h6>
-                <a href="/SysFAA/fichas/listar.php" class="btn btn-sm btn-outline-primary" style="border-radius:7px;font-size:.8rem;">
-                    Ver todas
+            <div class="card-header bg-white pt-4 pb-3 px-4 d-flex justify-content-between align-items-center" style="border-bottom:1px solid #eef1f7;">
+                <h6 class="mb-0" style="font-family:'Sora',sans-serif;font-weight:700;">Fichas Recentes</h6>
+                <a href="/SysFAA/fichas/listar.php" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" style="border-radius:8px;font-size:.8rem;">
+                    Ver todas <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
-            <div class="card-body px-4 pt-3">
+            <div class="card-body p-0">
                 <?php if (empty($ultimasFichas)): ?>
-                    <p class="text-muted text-center py-4" style="font-size:.9rem;">
+                    <p class="text-muted text-center py-5" style="font-size:.9rem;">
                         <i class="bi bi-inbox d-block mb-2" style="font-size:2rem;"></i>
                         Nenhuma ficha cadastrada ainda.
                     </p>
@@ -83,32 +83,30 @@ $porTipo = $db->query(
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0" style="font-size:.87rem;">
                             <thead>
-                                <tr style="color:#7a8aaa;border-bottom:1px solid #e8edf5;">
-                                    <th class="fw-500 border-0">Paciente</th>
-                                    <th class="fw-500 border-0">Tipo</th>
-                                    <th class="fw-500 border-0">Data Ficha</th>
-                                    <th class="fw-500 border-0">Enviado em</th>
-                                    <th class="border-0"></th>
+                                <tr style="color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
+                                    <th class="ps-4 py-3" style="background-color:#f4f6fb;border:0;border-bottom:1px solid #e8edf5;">Paciente</th>
+                                    <th class="py-3" style="background-color:#f4f6fb;border:0;border-bottom:1px solid #e8edf5;">Tipo</th>
+                                    <th class="py-3" style="background-color:#f4f6fb;border:0;border-bottom:1px solid #e8edf5;">Data Ficha</th>
+                                    <th class="py-3 pe-4" style="background-color:#f4f6fb;border:0;border-bottom:1px solid #e8edf5;">Enviado em</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($ultimasFichas as $f): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($f['paciente']) ?></td>
+                                    <tr style="cursor:pointer;" onclick="window.open('/SysFAA/fichas/visualizar.php?id=<?= $f['id'] ?>', '_blank')">
+                                        <td class="ps-4">
+                                            <a href="/SysFAA/fichas/listar.php?paciente_id=<?= $f['pac_id'] ?>"
+                                               onclick="event.stopPropagation()"
+                                               style="color:#1a56a0;text-decoration:none;font-weight:500;">
+                                                <?= htmlspecialchars($f['paciente']) ?>
+                                            </a>
+                                        </td>
                                         <td>
                                             <span class="badge" style="background:<?= $f['cor'] ?>22;color:<?= $f['cor'] ?>;font-weight:500;font-size:.78rem;border-radius:6px;padding:4px 8px;">
                                                 <?= htmlspecialchars($f['tipo']) ?>
                                             </span>
                                         </td>
-                                        <td><?= date('d/m/Y', strtotime($f['data_ficha'])) ?></td>
-                                        <td><?= date('d/m H:i', strtotime($f['criado_em'])) ?></td>
-                                        <td>
-                                            <a href="/SysFAA/fichas/visualizar.php?id=<?= $f['id'] ?>"
-                                                class="btn btn-sm btn-outline-secondary"
-                                                style="border-radius:6px;font-size:.78rem;">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                        </td>
+                                        <td class="text-muted"><?= date('d/m/Y', strtotime($f['data_ficha'])) ?></td>
+                                        <td class="text-muted pe-4" style="font-size:.82rem;"><?= date('d/m H:i', strtotime($f['criado_em'])) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -117,13 +115,20 @@ $porTipo = $db->query(
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Contagem, fora do card -->
+        <?php if (!empty($ultimasFichas)): ?>
+        <p class="text-muted mt-2 mb-0 ps-1" style="font-size:.84rem;">
+            <?= count($ultimasFichas) ?> registro<?= count($ultimasFichas) !== 1 ? 's' : '' ?> encontrado<?= count($ultimasFichas) !== 1 ? 's' : '' ?>
+        </p>
+        <?php endif; ?>
     </div>
 
     <!-- Cards: fichas por tipo -->
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100" style="border-radius:12px;">
-            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
-                <h6 class="mb-0" style="font-family:'Sora',sans-serif;font-weight:600;">Fichas por Tipo</h6>
+            <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
+                <h6 class="mb-0" style="font-family:'Sora',sans-serif;font-weight:700;">Fichas por Tipo</h6>
             </div>
             <div class="card-body px-4 pt-3">
                 <?php foreach ($porTipo as $t):

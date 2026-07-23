@@ -7,7 +7,7 @@ Auth::exigirPerfil(['admin','administracao']);
 $db = Database::get();
 
 // Carrega pacientes e tipos para os selects
-$pacientes = $db->query('SELECT id, nome FROM pacientes ORDER BY nome ASC')->fetchAll();
+$pacientes = $db->query('SELECT id, nome, data_nascimento, nome_mae FROM pacientes ORDER BY nome ASC')->fetchAll();
 $tipos     = $db->query('SELECT id, nome, cor FROM tipos_ficha WHERE ativo = 1 ORDER BY nome ASC')->fetchAll();
 ?>
 
@@ -54,8 +54,12 @@ $tipos     = $db->query('SELECT id, nome, cor FROM tipos_ficha WHERE ativo = 1 O
                             <select id="paciente_id" name="paciente_id" class="form-select"
                                     style="border-color:#d1dff0;border-left:none;border-radius:0 8px 8px 0;" required>
                                 <option value="">Selecione o paciente...</option>
-                                <?php foreach ($pacientes as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nome']) ?></option>
+                                <?php foreach ($pacientes as $p):
+                                    $rotulo = $p['nome'];
+                                    if ($p['data_nascimento']) $rotulo .= ' — Nasc: ' . date('d/m/Y', strtotime($p['data_nascimento']));
+                                    if ($p['nome_mae'])        $rotulo .= ' — Mãe: ' . $p['nome_mae'];
+                                ?>
+                                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($rotulo) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

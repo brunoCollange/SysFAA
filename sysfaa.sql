@@ -134,6 +134,8 @@ CREATE TABLE `fichas` (
 CREATE TABLE `pacientes` (
   `id` int(10) UNSIGNED NOT NULL,
   `nome` varchar(150) NOT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  `nome_mae` varchar(150) DEFAULT NULL,
   `criado_em` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -141,8 +143,8 @@ CREATE TABLE `pacientes` (
 -- Despejando dados para a tabela `pacientes`
 --
 
-INSERT INTO `pacientes` (`id`, `nome`, `criado_em`) VALUES
-(3, 'teste da silva', '2026-03-12 10:53:52');
+INSERT INTO `pacientes` (`id`, `nome`, `data_nascimento`, `nome_mae`, `criado_em`) VALUES
+(3, 'TESTE DA SILVA', NULL, NULL, '2026-03-12 10:53:52');
 
 -- --------------------------------------------------------
 
@@ -198,12 +200,12 @@ CREATE TABLE `tipos_ficha` (
 --
 
 INSERT INTO `tipos_ficha` (`id`, `nome`, `cor`, `ativo`, `criado_em`) VALUES
-(1, 'Internação', '#0d6efd', 1, '2026-03-12 09:14:01'),
-(2, 'Medicação', '#198754', 1, '2026-03-12 09:14:01'),
-(3, 'FAA Padrão', '#dc3545', 1, '2026-03-12 09:14:01'),
-(4, 'Evolução Médica', '#fd7e14', 1, '2026-03-12 09:14:01'),
-(6, 'Curativo', '#e1fd0d', 1, '2026-03-12 10:51:25'),
-(7, 'Notificação', '#fd0ddd', 1, '2026-03-12 11:07:12');
+(1, 'INTERNAÇÃO', '#0d6efd', 1, '2026-03-12 09:14:01'),
+(2, 'MEDICAÇÃO', '#198754', 1, '2026-03-12 09:14:01'),
+(3, 'FAA PADRÃO', '#dc3545', 1, '2026-03-12 09:14:01'),
+(4, 'EVOLUÇÃO MÉDICA', '#fd7e14', 1, '2026-03-12 09:14:01'),
+(6, 'CURATIVO', '#e1fd0d', 1, '2026-03-12 10:51:25'),
+(7, 'NOTIFICAÇÃO', '#fd0ddd', 1, '2026-03-12 11:07:12');
 
 -- --------------------------------------------------------
 
@@ -228,9 +230,9 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha_hash`, `perfil_id`, `ativo`, `criado_em`, `ultimo_acesso`, `ultima_atividade`) VALUES
-(2, 'administracao', 'administracao@gmail.com', '$2y$10$nKVQryD5msVKCpGswtlLpuT5n5pGd3QFUTOQc.6C9EK5gTXVoxje.', 2, 1, '2026-03-12 09:31:40', '2026-03-12 11:31:52', NULL),
-(3, 'Administrador', 'admin@gmail.com', '$2y$10$6s7F9nPD5cEEf8fJFxdo6utqTl22zL8rG4mHq/CkDxmcWoTKI9DyK', 1, 1, '2026-03-12 09:53:15', '2026-03-12 11:44:12', '2026-03-12 11:45:25'),
-(4, 'recepcao', 'recepcao@gmail.com', '$2y$10$8ZdQ8lUrQn0JWcN.xKqe.etynYY2ATiDGcS1WuoYIzIESwtze74.O', 3, 1, '2026-03-12 10:50:03', '2026-03-12 11:01:50', '2026-03-12 11:01:50');
+(2, 'ADMINISTRACAO', 'administracao@gmail.com', '$2y$10$nKVQryD5msVKCpGswtlLpuT5n5pGd3QFUTOQc.6C9EK5gTXVoxje.', 2, 1, '2026-03-12 09:31:40', '2026-03-12 11:31:52', NULL),
+(3, 'ADMINISTRADOR', 'admin@gmail.com', '$2y$10$6s7F9nPD5cEEf8fJFxdo6utqTl22zL8rG4mHq/CkDxmcWoTKI9DyK', 1, 1, '2026-03-12 09:53:15', '2026-03-12 11:44:12', '2026-03-12 11:45:25'),
+(4, 'RECEPCAO', 'recepcao@gmail.com', '$2y$10$8ZdQ8lUrQn0JWcN.xKqe.etynYY2ATiDGcS1WuoYIzIESwtze74.O', 3, 1, '2026-03-12 10:50:03', '2026-03-12 11:01:50', '2026-03-12 11:01:50');
 
 --
 -- Índices para tabelas despejadas

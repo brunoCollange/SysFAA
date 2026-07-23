@@ -1,0 +1,3 @@
+# Fichas enviadas pelos usuários (dados sensíveis de pacientes) — não versionar
+uploads/fichas/*
+!uploads/fichas/.gitkeep

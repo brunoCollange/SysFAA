@@ -287,7 +287,7 @@ $msg  = $_GET['msg'] ?? '';
                     Armazene, organize e acesse fichas digitalizadas.
                 </p>
             </div>
-            <div class="rodape-lateral">v<?= SYSFAA_VERSION ?> &nbsp;•&nbsp; Developed by Bruno Collange</div>
+            <div class="rodape-lateral">v<?= SYSFAA_VERSION ?> &nbsp;•&nbsp; Develop by <a href="https://www.colliveir.com.br/" target="_blank" rel="noopener" style="color:inherit;">Colliveir</a></div>
         </div>
 
         <!-- Formulário -->
