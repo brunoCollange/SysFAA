@@ -91,7 +91,7 @@ $paginaAtiva  = $paginaAtiva  ?? '';
             align-items: center;
             gap: 10px;
             padding: 9px 12px;
-            border-radius: 8px;
+            border-radius:6px;
             text-decoration: none;
             font-size: .88rem;
             color: rgba(255,255,255,.75);
@@ -265,7 +265,7 @@ $paginaAtiva  = $paginaAtiva  ?? '';
     </ul>
 
     <div class="sidebar-footer">
-        <b>Develop by <a href="https://www.colliveir.com.br/" target="_blank" rel="noopener" style="color:inherit;">Colliveir</a> <br>&copy; Colliveir - 2026</b>
+        <b>Developed by <a href="https://www.colliveir.com.br/" target="_blank" rel="noopener" style="color:inherit;">&copy;Colliveir</a> - 2026</b>
     </div>
 </nav>
 
@@ -281,24 +281,24 @@ $paginaAtiva  = $paginaAtiva  ?? '';
         </div>
         <div class="d-flex align-items-center gap-3">
             <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:8px;">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:6px;">
                     <i class="bi bi-person-circle"></i>
                     <span class="d-none d-md-inline"><?= htmlspecialchars($usuario['nome']) ?></span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius:10px;border:none;min-width:210px;padding:8px;">
-                    <li class="px-2 py-1">
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius:8px;border:none;min-width:210px;padding:8px;">
+                    <li class="px-3 py-1">
                         <div style="font-weight:600;color:#1e2d45;font-size:.88rem;"><?= htmlspecialchars($usuario['nome']) ?></div>
                         <div class="text-muted" style="font-size:.78rem;"><?= ucfirst($usuario['perfil']) ?></div>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <button class="dropdown-item d-flex align-items-center gap-2" type="button" style="border-radius:6px;" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
-                            <i class="bi bi-shield-lock"></i> Alterar Senha
+                        <button class="dropdown-item" type="button" style="border-radius:6px;" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
+                            Alterar Senha
                         </button>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 text-danger" style="border-radius:6px;" href="<?= BASE_URL ?>/auth/logout.php">
-                            <i class="bi bi-box-arrow-right"></i> Sair
+                        <a class="dropdown-item text-danger" style="border-radius:6px;" href="<?= BASE_URL ?>/auth/logout.php">
+                            Sair
                         </a>
                     </li>
                 </ul>

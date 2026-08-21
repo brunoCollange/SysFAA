@@ -5,20 +5,32 @@ require_once __DIR__ . '/../includes/header.php';
 
 $db = Database::get();
 
-// Busca e paginação
-$busca    = trim($_GET['q'] ?? '');
-$pagina   = max(1, (int)($_GET['p'] ?? 1));
-$porPagina = 20;
-$offset   = ($pagina - 1) * $porPagina;
+// Busca e paginação (servidor — mantém a tela rápida mesmo com muitos registros)
+$busca             = trim($_GET['q']          ?? '');
+$filtroNascimento  = trim($_GET['nascimento'] ?? '');
+$filtroMae         = trim($_GET['mae']        ?? '');
+$pagina            = max(1, (int)($_GET['p']  ?? 1));
+$porPagina         = 20;
+$offset            = ($pagina - 1) * $porPagina;
+$filtrosAtivos     = $busca !== '' || $filtroNascimento !== '' || $filtroMae !== '';
 
+$where  = ['1=1'];
 $params = [];
-$where  = '';
 if ($busca !== '') {
-    $where    = 'WHERE nome LIKE :q';
+    $where[] = 'nome LIKE :q';
     $params[':q'] = '%' . $busca . '%';
 }
+if ($filtroNascimento !== '') {
+    $where[] = 'data_nascimento = :nascimento';
+    $params[':nascimento'] = $filtroNascimento;
+}
+if ($filtroMae !== '') {
+    $where[] = 'nome_mae LIKE :mae';
+    $params[':mae'] = '%' . $filtroMae . '%';
+}
+$whereStr = implode(' AND ', $where);
 
-$total = $db->prepare("SELECT COUNT(*) FROM pacientes $where");
+$total = $db->prepare("SELECT COUNT(*) FROM pacientes WHERE $whereStr");
 $total->execute($params);
 $totalRegistros = (int)$total->fetchColumn();
 $totalPaginas   = max(1, (int)ceil($totalRegistros / $porPagina));
@@ -28,7 +40,7 @@ $stmt = $db->prepare(
             COUNT(f.id) AS total_fichas
      FROM pacientes p
      LEFT JOIN fichas f ON f.paciente_id = p.id
-     $where
+     WHERE $whereStr
      GROUP BY p.id
      ORDER BY p.nome ASC
      LIMIT :limit OFFSET :offset"
@@ -46,76 +58,107 @@ $msgErro    = $_GET['erro'] ?? '';
 
 <!-- Alertas -->
 <?php if ($msgSucesso): ?>
-<div class="alert alert-success d-flex align-items-center gap-2 mb-3" style="border-radius:10px;font-size:.88rem;" role="alert">
+<div class="alert alert-success d-flex align-items-center gap-2 mb-3" style="border-radius:8px;font-size:.88rem;" role="alert">
     <i class="bi bi-check-circle-fill"></i>
     <?= htmlspecialchars($msgSucesso) ?>
 </div>
 <?php endif; ?>
 <?php if ($msgErro): ?>
-<div class="alert alert-danger d-flex align-items-center gap-2 mb-3" style="border-radius:10px;font-size:.88rem;" role="alert">
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3" style="border-radius:8px;font-size:.88rem;" role="alert">
     <i class="bi bi-exclamation-circle-fill"></i>
     <?= htmlspecialchars($msgErro) ?>
 </div>
 <?php endif; ?>
 
-<!-- Tabela -->
-<div class="card border-0 shadow-sm" style="border-radius:12px;">
-    <div class="card-body p-0">
-
-        <!-- Barra de busca e ações -->
-        <form method="GET" action="">
-        <div class="d-flex align-items-center gap-3 flex-wrap p-3" style="border-bottom:1px solid #eef1f7;">
-            <div class="busca-pill d-flex align-items-center" style="flex:1 1 320px;max-width:420px;background:#f4f6fb;border-radius:10px;padding:3px 3px 3px 14px;transition:box-shadow .15s;">
-                <i class="bi bi-search text-muted" style="font-size:.9rem;"></i>
+<!-- Filtros -->
+<div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
+    <div class="card-body p-3">
+        <form method="GET" action="" id="formFiltrosPaciente">
+        <div class="filtros-grid">
+            <div class="campo-lg">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Nome</label>
                 <input
                     type="text"
                     name="q"
-                    class="form-control border-0 shadow-none px-2"
-                    placeholder="Buscar por nome..."
+                    class="form-control"
+                    placeholder="Nome do paciente"
                     value="<?= htmlspecialchars($busca) ?>"
-                    style="background:transparent;"
+                    style="background:#f4f6fb;border:none;border-radius:6px;"
+                    autocomplete="off"
+                    autofocus
                 >
-                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;border-radius:8px;">
-                    <i class="bi bi-search" style="font-size:.85rem;"></i>
-                </button>
             </div>
-            <?php if ($busca): ?>
+
+            <div class="campo-sm">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Data de Nascimento</label>
+                <input
+                    type="date"
+                    name="nascimento"
+                    class="form-control"
+                    value="<?= htmlspecialchars($filtroNascimento) ?>"
+                    style="background:#f4f6fb;border:none;border-radius:6px;"
+                >
+            </div>
+
+            <div class="campo-md">
+                <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Nome da Mãe</label>
+                <input
+                    type="text"
+                    name="mae"
+                    class="form-control"
+                    placeholder="Nome da mãe"
+                    value="<?= htmlspecialchars($filtroMae) ?>"
+                    style="background:#f4f6fb;border:none;border-radius:6px;"
+                    autocomplete="off"
+                >
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mt-3">
+            <?php if ($filtrosAtivos): ?>
             <a href="listar.php" class="text-decoration-none" style="font-size:.85rem;color:#7a8aaa;">Limpar filtros</a>
             <?php else: ?>
             <span style="font-size:.85rem;color:#c3cbdb;">Limpar filtros</span>
             <?php endif; ?>
+
             <?php if (Auth::temPermissao(['admin','administracao','recepcao'])): ?>
-            <a href="cadastrar.php" class="btn btn-primary d-flex align-items-center gap-2 ms-auto" style="border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;white-space:nowrap;">
+            <a href="cadastrar.php" class="btn btn-primary d-flex align-items-center gap-2" style="border-radius:6px;font-family:'Sora',sans-serif;font-weight:600;font-size:.9rem;white-space:nowrap;">
                 <i class="bi bi-person-plus"></i> Novo Paciente
             </a>
             <?php endif; ?>
         </div>
         </form>
+    </div>
+</div>
+
+<!-- Tabela -->
+<div class="card border-0 shadow-sm mt-3" style="border-radius:8px;overflow:hidden;">
+    <div class="card-body p-0">
 
         <?php if (empty($pacientes)): ?>
         <div class="text-center py-5 text-muted">
             <i class="bi bi-person-x d-block mb-2" style="font-size:2.5rem;"></i>
-            <?php if ($busca): ?>
-                Nenhum paciente encontrado para "<strong><?= htmlspecialchars($busca) ?></strong>".
+            <?php if ($filtrosAtivos): ?>
+            Nenhum paciente encontrado para os filtros aplicados.
             <?php else: ?>
-                Nenhum paciente cadastrado ainda.<br>
-                <a href="cadastrar.php" class="btn btn-primary mt-3" style="border-radius:8px;">Cadastrar primeiro paciente</a>
+            Nenhum paciente cadastrado ainda.<br>
+            <a href="cadastrar.php" class="btn btn-primary mt-3" style="border-radius:6px;">Cadastrar primeiro paciente</a>
             <?php endif; ?>
         </div>
         <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size:.88rem;">
+            <table class="table table-hover align-middle mb-0" style="font-size:.88rem;table-layout:fixed;width:100%;">
                 <thead>
                     <tr style="color:#7a8aaa;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;">
-                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">ID</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Nome do Paciente</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Nome da Mãe</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Nascimento</th>
-                        <th class="border-0 py-3 text-center" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Fichas</th>
-                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Cadastrado em</th>
+                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:7%;">ID</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:28%;">Nome do Paciente</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:22%;">Nome da Mãe</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:13%;">Nascimento</th>
+                        <th class="border-0 py-3 text-center" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:13%;">Fichas</th>
+                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:17%;">Cadastrado em</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="corpoTabelaPacientes">
                     <?php foreach ($pacientes as $p): ?>
                     <tr class="linha-paciente"
                         style="cursor:pointer;"
@@ -125,28 +168,16 @@ $msgErro    = $_GET['erro'] ?? '';
                         data-mae="<?= $p['nome_mae'] ? htmlspecialchars($p['nome_mae'], ENT_QUOTES) : '—' ?>"
                         data-nascimento="<?= $p['data_nascimento'] ? date('d/m/Y', strtotime($p['data_nascimento'])) : '—' ?>"
                         data-fichas="<?= (int)$p['total_fichas'] ?>"
-                        data-cadastro="<?= date('d/m/Y', strtotime($p['criado_em'])) ?>"
-                        data-cor="<?= gerarCorAvatar($p['nome']) ?>">
+                        data-cadastro="<?= date('d/m/Y', strtotime($p['criado_em'])) ?>">
                         <td class="ps-4" style="font-size:.8rem;color:#1a56a0;font-weight:600;">
                             <?= $p['id'] ?>
                         </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                <!-- Avatar com inicial -->
-                                <div style="
-                                    width:36px;height:36px;border-radius:50%;
-                                    background:<?= gerarCorAvatar($p['nome']) ?>;
-                                    display:flex;align-items:center;justify-content:center;
-                                    color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;
-                                ">
-                                    <?= mb_strtoupper(mb_substr($p['nome'], 0, 1)) ?>
-                                </div>
-                                <span style="font-weight:500;color:#1e2d45;">
-                                    <?= htmlspecialchars($p['nome']) ?>
-                                </span>
-                            </div>
+                        <td style="max-width:0;">
+                            <span class="text-truncate d-block" style="font-weight:500;color:#1e2d45;" title="<?= htmlspecialchars($p['nome']) ?>">
+                                <?= htmlspecialchars($p['nome']) ?>
+                            </span>
                         </td>
-                        <td class="text-muted" style="font-size:.85rem;">
+                        <td class="text-muted text-truncate" style="font-size:.85rem;max-width:0;">
                             <?= $p['nome_mae'] ? htmlspecialchars($p['nome_mae']) : '—' ?>
                         </td>
                         <td class="text-muted" style="font-size:.85rem;">
@@ -155,10 +186,10 @@ $msgErro    = $_GET['erro'] ?? '';
                         <td class="text-center">
                             <?php if ($p['total_fichas'] > 0): ?>
                             <a href="<?= BASE_URL ?>/fichas/listar.php?paciente_id=<?= $p['id'] ?>"
-                               class="badge text-decoration-none"
+                               class="text-muted text-decoration-none"
                                onclick="event.stopPropagation()"
-                               style="background:#e8f1fb;color:#1a56a0;border-radius:20px;padding:4px 10px;font-size:.8rem;font-weight:600;">
-                                <?= $p['total_fichas'] ?> ficha<?= $p['total_fichas'] > 1 ? 's' : '' ?>
+                               style="font-size:.85rem;">
+                                <?= $p['total_fichas'] ?> ficha(s)
                             </a>
                             <?php else: ?>
                             <span class="text-muted" style="font-size:.8rem;">—</span>
@@ -177,18 +208,23 @@ $msgErro    = $_GET['erro'] ?? '';
 </div>
 
 <!-- Rodapé: contagem e paginação, fora do card -->
-<?php if (!empty($pacientes)): ?>
+<?php if (!empty($pacientes)):
+    $qb = http_build_query(array_filter([
+        'q'          => $busca            !== '' ? $busca            : null,
+        'nascimento' => $filtroNascimento !== '' ? $filtroNascimento : null,
+        'mae'        => $filtroMae        !== '' ? $filtroMae        : null,
+    ]));
+?>
 <div class="d-flex align-items-center justify-content-between mt-2 px-1" style="font-size:.84rem;">
     <span class="text-muted">
-        <?= number_format($totalRegistros, 0, ',', '.') ?> registro<?= $totalRegistros !== 1 ? 's' : '' ?> encontrado<?= $totalRegistros !== 1 ? 's' : '' ?>
+        <?= number_format($totalRegistros, 0, ',', '.') ?> registro(s) encontrado(s)
     </span>
     <?php if ($totalPaginas > 1): ?>
     <nav>
         <ul class="pagination pagination-sm mb-0 gap-1">
             <?php for ($pg = 1; $pg <= $totalPaginas; $pg++): ?>
             <li class="page-item <?= $pg === $pagina ? 'active' : '' ?>">
-                <a class="page-link"
-                   href="?p=<?= $pg ?><?= $busca ? '&q=' . urlencode($busca) : '' ?>"
+                <a class="page-link" href="?p=<?= $pg ?>&<?= $qb ?>"
                    style="border-radius:6px;<?= $pg === $pagina ? 'background:#1a56a0;border-color:#1a56a0;' : '' ?>">
                     <?= $pg ?>
                 </a>
@@ -203,15 +239,12 @@ $msgErro    = $_GET['erro'] ?? '';
 <!-- Modal de detalhes do paciente -->
 <div class="modal fade" id="modalPaciente" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:16px;border:none;overflow:hidden;">
+        <div class="modal-content" style="border-radius:8px;border:none;overflow:hidden;">
             <div class="position-relative p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
                 <button type="button" class="btn-close btn-close-white position-absolute" style="top:18px;right:18px;" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                <div class="d-flex align-items-center gap-3">
-                    <div id="pacienteModalAvatar" style="width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.4rem;flex-shrink:0;background:rgba(255,255,255,.2);"></div>
-                    <div>
-                        <h5 id="pacienteModalNome" class="mb-1" style="font-family:'Sora',sans-serif;font-weight:700;"></h5>
-                        <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<span id="pacienteModalId"></span></span>
-                    </div>
+                <div>
+                    <h5 id="pacienteModalNome" class="mb-1" style="font-family:'Sora',sans-serif;font-weight:700;"></h5>
+                    <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<span id="pacienteModalId"></span></span>
                 </div>
             </div>
             <div class="modal-body p-4">
@@ -235,16 +268,16 @@ $msgErro    = $_GET['erro'] ?? '';
                 </div>
             </div>
             <div class="modal-footer border-top-0 p-4 pt-0 d-flex flex-column gap-2">
-                <a id="pacienteModalVerFichas" href="#" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;">
+                <a id="pacienteModalVerFichas" href="#" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:6px;font-weight:600;font-size:.88rem;">
                     <i class="bi bi-file-earmark-medical"></i> Ver Fichas do Paciente
                 </a>
                 <?php if (Auth::temPermissao(['admin','administracao'])): ?>
-                <a id="pacienteModalEditar" href="#" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;">
+                <a id="pacienteModalEditar" href="#" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:6px;font-weight:600;font-size:.88rem;">
                     <i class="bi bi-pencil"></i> Editar Paciente
                 </a>
                 <?php endif; ?>
                 <?php if (Auth::temPermissao('admin')): ?>
-                <button type="button" id="pacienteModalExcluir" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;font-weight:600;font-size:.88rem;">
+                <button type="button" id="pacienteModalExcluir" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius:6px;font-weight:600;font-size:.88rem;">
                     <i class="bi bi-trash"></i> Excluir Paciente
                 </button>
                 <?php endif; ?>
@@ -256,7 +289,7 @@ $msgErro    = $_GET['erro'] ?? '';
 <!-- Modal de confirmação de exclusão -->
 <div class="modal fade" id="modalExcluir" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:14px;border:none;">
+        <div class="modal-content" style="border-radius:8px;border:none;overflow:hidden;">
             <div class="modal-body text-center p-5">
                 <div style="width:60px;height:60px;background:#fff2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                     <i class="bi bi-trash" style="font-size:1.6rem;color:#dc3545;"></i>
@@ -267,8 +300,8 @@ $msgErro    = $_GET['erro'] ?? '';
                     <span style="color:#dc3545;font-size:.82rem;">Esta ação não pode ser desfeita.</span>
                 </p>
                 <div class="d-flex gap-2 justify-content-center">
-                    <button type="button" class="btn btn-outline-secondary px-4" style="border-radius:8px;" data-bs-dismiss="modal">Cancelar</button>
-                    <a id="btnConfirmarExcluir" href="#" class="btn btn-danger px-4" style="border-radius:8px;">Excluir</a>
+                    <button type="button" class="btn btn-outline-secondary px-4" style="border-radius:6px;" data-bs-dismiss="modal">Cancelar</button>
+                    <a id="btnConfirmarExcluir" href="#" class="btn btn-danger px-4" style="border-radius:6px;">Excluir</a>
                 </div>
             </div>
         </div>
@@ -276,23 +309,41 @@ $msgErro    = $_GET['erro'] ?? '';
 </div>
 
 <style>
-.busca-pill:focus-within {
-    background: #eef2fa;
-    box-shadow: 0 0 0 3px #e8f1fb;
+.filtros-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
+.filtros-grid > .campo-lg { flex: 3 1 220px; }
+.filtros-grid > .campo-md { flex: 2 1 160px; }
+.filtros-grid > .campo-sm { flex: 1 1 130px; }
 </style>
 
-<?php
-require_once __DIR__ . '/../includes/footer.php';
-
-// Gera cor consistente para avatar baseada no nome
-function gerarCorAvatar(string $nome): string {
-    $cores = ['#1a56a0','#198754','#6f42c1','#fd7e14','#0dcaf0','#d63384','#20c997','#dc3545'];
-    return $cores[crc32($nome) % count($cores)];
-}
-?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formFiltros = document.getElementById('formFiltrosPaciente');
+    if (!formFiltros) return;
+
+    let timerBusca = null;
+    formFiltros.querySelectorAll('input[name="q"], input[name="mae"]').forEach(function(campo) {
+        campo.addEventListener('input', function() {
+            clearTimeout(timerBusca);
+            timerBusca = setTimeout(function() {
+                formFiltros.submit();
+            }, 500);
+        });
+    });
+
+    const dataNascimento = formFiltros.querySelector('input[name="nascimento"]');
+    if (dataNascimento) {
+        dataNascimento.addEventListener('change', function() {
+            formFiltros.submit();
+        });
+    }
+});
+
 function confirmarExclusao(id, nome) {
     document.getElementById('nomeExcluir').textContent = nome;
     document.getElementById('btnConfirmarExcluir').href = 'excluir.php?id=' + id;
@@ -307,10 +358,6 @@ function abrirModalPaciente(tr) {
     const d = tr.dataset;
     pacienteAtual = { id: d.id, nome: d.nome };
 
-    const avatar = document.getElementById('pacienteModalAvatar');
-    avatar.textContent = d.nome.charAt(0).toUpperCase();
-    avatar.style.background = d.cor;
-
     document.getElementById('pacienteModalNome').textContent = d.nome;
     document.getElementById('pacienteModalId').textContent = d.id;
     document.getElementById('pacienteModalMae').textContent = d.mae;
@@ -318,7 +365,7 @@ function abrirModalPaciente(tr) {
 
     const totalFichas = parseInt(d.fichas, 10);
     document.getElementById('pacienteModalFichas').textContent = totalFichas > 0
-        ? totalFichas + ' ficha' + (totalFichas > 1 ? 's' : '')
+        ? totalFichas + ' ficha(s)'
         : 'Nenhuma ficha';
 
     document.getElementById('pacienteModalCadastro').textContent = d.cadastro;

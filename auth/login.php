@@ -164,7 +164,7 @@ $msg  = $_GET['msg'] ?? '';
 
         .form-control {
             border: 1.5px solid var(--borda);
-            border-radius: 8px;
+            border-radius:6px;
             padding: 10px 14px;
             font-size: .92rem;
             color: var(--texto);
@@ -183,7 +183,7 @@ $msg  = $_GET['msg'] ?? '';
         .input-group .btn-outline-secondary {
             border: 1.5px solid var(--borda);
             border-left: none;
-            border-radius: 0 8px 8px 0;
+            border-radius: 0 6px 6px 0;
             color: #7a8aaa;
             background: #fafbfd;
         }
@@ -196,7 +196,7 @@ $msg  = $_GET['msg'] ?? '';
         .btn-entrar {
             background: linear-gradient(90deg, var(--azul) 0%, var(--azul-mid) 100%);
             border: none;
-            border-radius: 8px;
+            border-radius:6px;
             padding: 11px;
             font-family: 'Sora', sans-serif;
             font-weight: 600;
@@ -230,7 +230,7 @@ $msg  = $_GET['msg'] ?? '';
         .alert-erro {
             background: #fff2f2;
             border: 1px solid #f5c2c7;
-            border-radius: 8px;
+            border-radius:6px;
             color: #842029;
             font-size: .87rem;
             padding: 10px 14px;
@@ -243,7 +243,7 @@ $msg  = $_GET['msg'] ?? '';
         .alert-sucesso {
             background: #f0fdf4;
             border: 1px solid #b7edc8;
-            border-radius: 8px;
+            border-radius:6px;
             color: #166534;
             font-size: .87rem;
             padding: 10px 14px;

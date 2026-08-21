@@ -5,20 +5,20 @@
 <!-- Modal: Alterar Senha -->
 <div class="modal fade" id="modalAlterarSenha" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:14px;border:none;">
+        <div class="modal-content" style="border-radius:8px;border:none;overflow:hidden;">
             <div class="modal-body p-4">
                 <h5 class="mb-4 d-flex align-items-center gap-2" style="font-family:'Sora',sans-serif;font-weight:700;">
                     <i class="bi bi-shield-lock" style="color:#1a56a0;"></i> Alterar Senha
                 </h5>
 
-                <div id="alterarSenhaAlerta" class="alert d-none align-items-center gap-2 mb-3" style="border-radius:8px;font-size:.88rem;"></div>
+                <div id="alterarSenhaAlerta" class="alert d-none align-items-center gap-2 mb-3" style="border-radius:6px;font-size:.88rem;"></div>
 
                 <form id="formAlterarSenha" novalidate>
                     <div class="mb-3">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">Senha atual <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="password" id="senhaAtualInput" class="form-control" style="border-radius:8px 0 0 8px;border-color:#d1dff0;" required>
-                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('senhaAtualInput', this)" style="border-color:#d1dff0;border-radius:0 8px 8px 0;">
+                            <input type="password" id="senhaAtualInput" class="form-control" style="border-radius:6px 0 0 6px;border-color:#d1dff0;" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('senhaAtualInput', this)" style="border-color:#d1dff0;border-radius:0 6px 6px 0;">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -27,8 +27,8 @@
                     <div class="mb-3">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">Nova senha <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="password" id="novaSenhaInput" class="form-control" minlength="8" style="border-radius:8px 0 0 8px;border-color:#d1dff0;" required>
-                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('novaSenhaInput', this)" style="border-color:#d1dff0;border-radius:0 8px 8px 0;">
+                            <input type="password" id="novaSenhaInput" class="form-control" minlength="8" style="border-radius:6px 0 0 6px;border-color:#d1dff0;" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('novaSenhaInput', this)" style="border-color:#d1dff0;border-radius:0 6px 6px 0;">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -38,8 +38,8 @@
                     <div class="mb-1">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">Confirmar nova senha <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="password" id="confirmarNovaSenhaInput" class="form-control" style="border-radius:8px 0 0 8px;border-color:#d1dff0;" required>
-                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('confirmarNovaSenhaInput', this)" style="border-color:#d1dff0;border-radius:0 8px 8px 0;">
+                            <input type="password" id="confirmarNovaSenhaInput" class="form-control" style="border-radius:6px 0 0 6px;border-color:#d1dff0;" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="alternarVisibilidadeSenha('confirmarNovaSenhaInput', this)" style="border-color:#d1dff0;border-radius:0 6px 6px 0;">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -47,10 +47,29 @@
                 </form>
             </div>
             <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-                <button type="button" class="btn btn-outline-secondary px-4" style="border-radius:8px;" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" id="btnSalvarSenha" class="btn btn-success px-4" style="border-radius:8px;font-weight:600;" onclick="enviarAlterarSenha()">
+                <button type="button" class="btn btn-outline-secondary px-4" style="border-radius:6px;" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnSalvarSenha" class="btn btn-success px-4" style="border-radius:6px;font-weight:600;" onclick="enviarAlterarSenha()">
                     <i class="bi bi-floppy me-2"></i>Salvar
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Aviso (substitui alert()/confirm() nativos do navegador) -->
+<div class="modal fade" id="modalAviso" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:8px;border:none;overflow:hidden;">
+            <div class="modal-body text-center p-5">
+                <div id="avisoIconWrap" style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                    <i id="avisoIcon" class="bi" style="font-size:2.2rem;"></i>
+                </div>
+                <h5 id="avisoTitulo" style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.35rem;margin-bottom:10px;"></h5>
+                <p id="avisoMensagem" class="text-muted mb-4" style="font-size:1rem;"></p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" id="avisoBtnCancelar" class="btn btn-outline-secondary px-5 py-2" style="border-radius:6px;font-size:.95rem;display:none;" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="avisoBtnOk" class="btn btn-primary px-5 py-2" style="border-radius:6px;font-size:.95rem;" data-bs-dismiss="modal">OK</button>
+                </div>
             </div>
         </div>
     </div>
@@ -129,6 +148,60 @@ document.getElementById('modalAlterarSenha')?.addEventListener('hidden.bs.modal'
     const alerta = document.getElementById('alterarSenhaAlerta');
     alerta.className = 'alert d-none';
     alerta.textContent = '';
+});
+
+// ── Modal de aviso global (substitui alert()/confirm()) ─────
+let avisoCallbackConfirmar = null;
+
+function mostrarAviso(mensagem, tipo, titulo) {
+    tipo = tipo || 'warning';
+    const mapa = {
+        warning: { cor: '#fd7e14', bg: '#fff8e6', icone: 'bi-exclamation-triangle-fill', titulo: 'Atenção' },
+        danger:  { cor: '#dc3545', bg: '#fff2f2', icone: 'bi-exclamation-circle-fill',   titulo: 'Erro' },
+        success: { cor: '#198754', bg: '#e9f7ef', icone: 'bi-check-circle-fill',         titulo: 'Sucesso' },
+        info:    { cor: '#1a56a0', bg: '#e8f1fb', icone: 'bi-info-circle-fill',          titulo: 'Aviso' },
+    };
+    const cfg = mapa[tipo] || mapa.warning;
+
+    document.getElementById('avisoIconWrap').style.background = cfg.bg;
+    document.getElementById('avisoIcon').className = 'bi ' + cfg.icone;
+    document.getElementById('avisoIcon').style.color = cfg.cor;
+    document.getElementById('avisoTitulo').textContent = titulo || cfg.titulo;
+    document.getElementById('avisoMensagem').innerHTML = mensagem;
+    document.getElementById('avisoBtnCancelar').style.display = 'none';
+
+    const btnOk = document.getElementById('avisoBtnOk');
+    btnOk.textContent = 'OK';
+    btnOk.className = 'btn btn-primary px-4';
+    avisoCallbackConfirmar = null;
+
+    new bootstrap.Modal(document.getElementById('modalAviso')).show();
+}
+
+function confirmarAviso(mensagem, onConfirmar, opcoes) {
+    opcoes = opcoes || {};
+
+    document.getElementById('avisoIconWrap').style.background = opcoes.bg || '#fff2f2';
+    document.getElementById('avisoIcon').className = 'bi ' + (opcoes.icone || 'bi-trash');
+    document.getElementById('avisoIcon').style.color = opcoes.cor || '#dc3545';
+    document.getElementById('avisoTitulo').textContent = opcoes.titulo || 'Confirmar ação';
+    document.getElementById('avisoMensagem').innerHTML = mensagem;
+    document.getElementById('avisoBtnCancelar').style.display = 'inline-block';
+
+    const btnOk = document.getElementById('avisoBtnOk');
+    btnOk.textContent = opcoes.textoConfirmar || 'Confirmar';
+    btnOk.className = 'btn px-4 ' + (opcoes.classeConfirmar || 'btn-danger');
+    avisoCallbackConfirmar = onConfirmar;
+
+    new bootstrap.Modal(document.getElementById('modalAviso')).show();
+}
+
+document.getElementById('avisoBtnOk').addEventListener('click', function () {
+    if (avisoCallbackConfirmar) {
+        const cb = avisoCallbackConfirmar;
+        avisoCallbackConfirmar = null;
+        cb();
+    }
 });
 </script>
 <?php if (!empty($scriptsExtras)) echo $scriptsExtras; ?>

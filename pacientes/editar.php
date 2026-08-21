@@ -73,7 +73,7 @@ $qtdFichas = $totalFichas->fetchColumn();
 ?>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="listar.php" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">
+    <a href="listar.php" class="btn btn-outline-secondary btn-sm" style="border-radius:6px;">
         <i class="bi bi-arrow-left"></i>
     </a>
     <div>
@@ -84,23 +84,18 @@ $qtdFichas = $totalFichas->fetchColumn();
 
 <form method="POST" novalidate>
 
-<div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+<div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
 
     <!-- Faixa de identificação -->
-    <div class="d-flex align-items-center gap-3 p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
-        <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.3rem;flex-shrink:0;">
-            <?= mb_strtoupper(mb_substr($nome, 0, 1)) ?>
-        </div>
-        <div>
-            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;"><?= htmlspecialchars($nome) ?></div>
-            <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<?= $id ?></span>
-        </div>
+    <div class="p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;"><?= htmlspecialchars($nome) ?></div>
+        <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<?= $id ?></span>
     </div>
 
     <div class="card-body p-4 p-md-5">
 
         <?php if ($erro): ?>
-        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" style="border-radius:8px;font-size:.88rem;">
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" style="border-radius:6px;font-size:.88rem;">
             <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
             <?= htmlspecialchars($erro) ?>
         </div>
@@ -108,9 +103,9 @@ $qtdFichas = $totalFichas->fetchColumn();
 
         <?php if ($qtdFichas > 0): ?>
         <div class="mb-4 p-3 d-flex align-items-center gap-2"
-             style="background:#e8f1fb;border-radius:10px;font-size:.85rem;color:#1a56a0;">
+             style="background:#e8f1fb;border-radius:8px;font-size:.85rem;color:#1a56a0;">
             <i class="bi bi-info-circle-fill flex-shrink-0"></i>
-            Este paciente possui <strong><?= $qtdFichas ?> ficha<?= $qtdFichas > 1 ? 's' : '' ?></strong> vinculada<?= $qtdFichas > 1 ? 's' : '' ?>.
+            Este paciente possui <strong><?= $qtdFichas ?> ficha(s)</strong> vinculada(s).
             <a href="<?= BASE_URL ?>/fichas/listar.php?paciente_id=<?= $id ?>" style="color:#1a56a0;font-weight:600;">Ver fichas →</a>
         </div>
         <?php endif; ?>
@@ -122,7 +117,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                     Nome completo <span class="text-danger">*</span>
                 </label>
                 <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;border-color:#d1dff0;">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius:6px 0 0 6px;border-color:#d1dff0;">
                         <i class="bi bi-person text-muted"></i>
                     </span>
                     <input
@@ -134,7 +129,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                         maxlength="150"
                         autofocus
                         required
-                        style="border-radius:0 8px 8px 0;border-color:#d1dff0;text-transform:uppercase;"
+                        style="border-radius:0 6px 6px 0;border-color:#d1dff0;text-transform:uppercase;"
                     >
                 </div>
                 <div class="d-flex justify-content-between mt-1">
@@ -149,7 +144,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                         Data de nascimento <span class="text-danger">*</span>
                     </label>
                     <div class="input-group input-group-lg">
-                        <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;border-color:#d1dff0;">
+                        <span class="input-group-text bg-white border-end-0" style="border-radius:6px 0 0 6px;border-color:#d1dff0;">
                             <i class="bi bi-calendar3 text-muted"></i>
                         </span>
                         <input
@@ -160,7 +155,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                             value="<?= htmlspecialchars($dataNascimento) ?>"
                             max="<?= date('Y-m-d') ?>"
                             required
-                            style="border-radius:0 8px 8px 0;border-color:#d1dff0;"
+                            style="border-radius:0 6px 6px 0;border-color:#d1dff0;"
                         >
                     </div>
                 </div>
@@ -170,7 +165,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                         Nome da mãe <span class="text-danger">*</span>
                     </label>
                     <div class="input-group input-group-lg">
-                        <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;border-color:#d1dff0;">
+                        <span class="input-group-text bg-white border-end-0" style="border-radius:6px 0 0 6px;border-color:#d1dff0;">
                             <i class="bi bi-gender-female text-muted"></i>
                         </span>
                         <input
@@ -181,7 +176,7 @@ $qtdFichas = $totalFichas->fetchColumn();
                             value="<?= htmlspecialchars($nomeMae) ?>"
                             maxlength="150"
                             required
-                            style="border-radius:0 8px 8px 0;border-color:#d1dff0;text-transform:uppercase;"
+                            style="border-radius:0 6px 6px 0;border-color:#d1dff0;text-transform:uppercase;"
                         >
                     </div>
                 </div>
@@ -191,8 +186,8 @@ $qtdFichas = $totalFichas->fetchColumn();
 </div>
 
 <div class="d-flex justify-content-end gap-2 mt-3">
-    <a href="listar.php" class="btn btn-outline-secondary px-4" style="border-radius:8px;">Cancelar</a>
-    <button type="submit" class="btn btn-success px-4" style="border-radius:8px;font-weight:600;">
+    <a href="listar.php" class="btn btn-outline-secondary px-4" style="border-radius:6px;">Cancelar</a>
+    <button type="submit" class="btn btn-success px-4" style="border-radius:6px;font-weight:600;">
         <i class="bi bi-floppy me-2"></i>Salvar
     </button>
 </div>

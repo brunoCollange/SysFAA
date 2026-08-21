@@ -7,20 +7,20 @@ Auth::exigirPerfil('admin');
 $db = Database::get();
 
 // Filtros
-$filtroUsuario = (int)($_GET['usuario_id'] ?? 0);
-$filtroAcao    = trim($_GET['acao']        ?? '');
-$filtroDataDe  = trim($_GET['data_de']     ?? '');
-$filtroDataAte = trim($_GET['data_ate']    ?? '');
-$pagina        = max(1, (int)($_GET['p']   ?? 1));
+$filtroUsuario = trim($_GET['usuario']  ?? '');
+$filtroAcao    = trim($_GET['acao']     ?? '');
+$filtroDataDe  = trim($_GET['data_de']  ?? '');
+$filtroDataAte = trim($_GET['data_ate'] ?? '');
+$pagina        = max(1, (int)($_GET['p'] ?? 1));
 $porPagina     = 30;
 $offset        = ($pagina - 1) * $porPagina;
 
 $where  = ['1=1'];
 $params = [];
 
-if ($filtroUsuario) {
-    $where[] = 'a.usuario_id = :uid';
-    $params[':uid'] = $filtroUsuario;
+if ($filtroUsuario !== '') {
+    $where[] = 'u.nome LIKE :unome';
+    $params[':unome'] = '%' . $filtroUsuario . '%';
 }
 if ($filtroAcao) {
     $where[] = 'a.acao = :acao';
@@ -37,7 +37,9 @@ if ($filtroDataAte) {
 
 $whereStr = implode(' AND ', $where);
 
-$stmtTotal = $db->prepare("SELECT COUNT(*) FROM auditoria a WHERE $whereStr");
+$stmtTotal = $db->prepare(
+    "SELECT COUNT(*) FROM auditoria a LEFT JOIN usuarios u ON u.id = a.usuario_id WHERE $whereStr"
+);
 $stmtTotal->execute($params);
 $total = (int)$stmtTotal->fetchColumn();
 $totalPaginas = max(1, (int)ceil($total / $porPagina));
@@ -56,9 +58,8 @@ $stmt->bindValue(':off', $offset,    PDO::PARAM_INT);
 $stmt->execute();
 $logs = $stmt->fetchAll();
 
-// Listas para filtros
-$usuarios = $db->query('SELECT id, nome FROM usuarios ORDER BY nome ASC')->fetchAll();
-$acoes    = $db->query('SELECT DISTINCT acao FROM auditoria ORDER BY acao ASC')->fetchAll(PDO::FETCH_COLUMN);
+// Lista para filtro de ação
+$acoes = $db->query('SELECT DISTINCT acao FROM auditoria ORDER BY acao ASC')->fetchAll(PDO::FETCH_COLUMN);
 
 // Mapa de cores por ação
 function corAcao(string $acao): array {
@@ -86,52 +87,53 @@ function corAcao(string $acao): array {
 }
 ?>
 
-<!-- Tabela -->
-<div class="card border-0 shadow-sm" style="border-radius:12px;">
-    <div class="card-body p-0">
+<!-- Filtros -->
+<div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
+    <div class="card-body p-3">
+        <form method="GET" id="formFiltrosAuditoria">
+        <div class="filtros-grid">
 
-        <!-- Barra de filtros -->
-        <form method="GET">
-        <div class="d-flex align-items-end gap-3 flex-wrap p-3" style="border-bottom:1px solid #eef1f7;">
-
-            <div style="flex:1 1 220px;max-width:280px;">
+            <div class="campo-lg">
                 <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Usuário</label>
-                <select name="usuario_id" class="form-select" style="background:#f4f6fb;border:none;border-radius:8px;">
-                    <option value="">Todos</option>
-                    <?php foreach ($usuarios as $u): ?>
-                    <option value="<?= $u['id'] ?>" <?= $filtroUsuario == $u['id'] ? 'selected':'' ?>>
-                        <?= htmlspecialchars($u['nome']) ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
+                <input
+                    type="text"
+                    name="usuario"
+                    class="form-control"
+                    placeholder="Nome do usuário"
+                    value="<?= htmlspecialchars($filtroUsuario) ?>"
+                    style="background:#f4f6fb;border:none;border-radius:6px;"
+                    autocomplete="off"
+                >
             </div>
 
-            <div style="flex:1 1 180px;max-width:220px;">
+            <div class="campo-md">
                 <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Ação</label>
-                <select name="acao" class="form-select" style="background:#f4f6fb;border:none;border-radius:8px;">
-                    <option value="">Todas</option>
-                    <?php foreach ($acoes as $a): ?>
-                    <option value="<?= $a ?>" <?= $filtroAcao === $a ? 'selected':'' ?>><?= $a ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="select-dropdown">
+                    <select name="acao" class="form-select select-dropdown-input" style="background-color:#f4f6fb;border:none;border-radius:6px;">
+                        <option value="">Todas</option>
+                        <?php foreach ($acoes as $a): ?>
+                        <option value="<?= $a ?>" <?= $filtroAcao === $a ? 'selected':'' ?>><?= $a ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <i class="bi bi-chevron-down select-dropdown-chevron"></i>
+                </div>
             </div>
 
-            <div style="flex:0 1 150px;">
+            <div class="campo-sm">
                 <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Data de</label>
                 <input type="date" name="data_de" class="form-control"
-                       value="<?= htmlspecialchars($filtroDataDe) ?>" style="background:#f4f6fb;border:none;border-radius:8px;">
+                       value="<?= htmlspecialchars($filtroDataDe) ?>" style="background:#f4f6fb;border:none;border-radius:6px;">
             </div>
 
-            <div style="flex:0 1 150px;">
+            <div class="campo-sm">
                 <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Data até</label>
                 <input type="date" name="data_ate" class="form-control"
-                       value="<?= htmlspecialchars($filtroDataAte) ?>" style="background:#f4f6fb;border:none;border-radius:8px;">
+                       value="<?= htmlspecialchars($filtroDataAte) ?>" style="background:#f4f6fb;border:none;border-radius:6px;">
             </div>
 
-            <button type="submit" class="btn btn-outline-secondary d-flex align-items-center gap-2" style="border-radius:8px;">
-                <i class="bi bi-funnel"></i> Filtrar
-            </button>
+        </div>
 
+        <div class="d-flex align-items-center justify-content-between mt-3">
             <?php if ($filtroUsuario || $filtroAcao || $filtroDataDe || $filtroDataAte): ?>
             <a href="auditoria.php" class="text-decoration-none" style="font-size:.85rem;color:#7a8aaa;">Limpar filtros</a>
             <?php else: ?>
@@ -139,6 +141,12 @@ function corAcao(string $acao): array {
             <?php endif; ?>
         </div>
         </form>
+    </div>
+</div>
+
+<!-- Tabela -->
+<div class="card border-0 shadow-sm mt-3" style="border-radius:8px;overflow:hidden;">
+    <div class="card-body p-0">
 
         <?php if (empty($logs)): ?>
         <div class="text-center py-5 text-muted">
@@ -147,14 +155,14 @@ function corAcao(string $acao): array {
         </div>
         <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
+            <table class="table table-hover align-middle mb-0" style="font-size:.85rem;table-layout:fixed;width:100%;">
                 <thead>
                     <tr style="color:#7a8aaa;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;">
-                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Data/Hora</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Ação</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Usuário</th>
-                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">Descrição</th>
-                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;">IP</th>
+                        <th class="border-0 ps-4 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:16%;">Data/Hora</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:15%;">Ação</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:15%;">Usuário</th>
+                        <th class="border-0 py-3" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:39%;">Descrição</th>
+                        <th class="border-0 py-3 pe-4" style="background-color:#f4f6fb;border-bottom:1px solid #e8edf5;width:15%;">IP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,14 +180,14 @@ function corAcao(string $acao): array {
                             <?= htmlspecialchars($log['acao']) ?>
                         </span>
                     </td>
-                    <td style="font-weight:500;color:#1e2d45;">
+                    <td class="text-truncate" style="font-weight:500;color:#1e2d45;max-width:0;">
                         <?= $log['usuario_nome'] ? htmlspecialchars($log['usuario_nome']) : '<span class="text-muted">Sistema</span>' ?>
                     </td>
-                    <td class="text-muted" style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                    <td class="text-muted text-truncate" style="max-width:0;"
                         title="<?= htmlspecialchars($log['descricao'] ?? '') ?>">
                         <?= htmlspecialchars($log['descricao'] ?? '—') ?>
                     </td>
-                    <td class="pe-4 text-muted" style="font-size:.8rem;font-family:monospace;">
+                    <td class="pe-4 text-muted text-truncate" style="font-size:.8rem;font-family:monospace;max-width:0;">
                         <?= htmlspecialchars($log['ip'] ?? '—') ?>
                     </td>
                 </tr>
@@ -194,15 +202,15 @@ function corAcao(string $acao): array {
 <!-- Rodapé: contagem e paginação, fora do card -->
 <?php if (!empty($logs)):
     $qb = http_build_query(array_filter([
-        'usuario_id' => $filtroUsuario ?: null,
-        'acao'       => $filtroAcao    ?: null,
-        'data_de'    => $filtroDataDe  ?: null,
-        'data_ate'   => $filtroDataAte ?: null,
+        'usuario'  => $filtroUsuario !== '' ? $filtroUsuario : null,
+        'acao'     => $filtroAcao    ?: null,
+        'data_de'  => $filtroDataDe  ?: null,
+        'data_ate' => $filtroDataAte ?: null,
     ]));
 ?>
 <div class="d-flex align-items-center justify-content-between mt-2 px-1" style="font-size:.84rem;">
     <span class="text-muted">
-        <?= number_format($total, 0, ',', '.') ?> registro<?= $total !== 1 ? 's' : '' ?> encontrado<?= $total !== 1 ? 's' : '' ?>
+        <?= number_format($total, 0, ',', '.') ?> registro(s) encontrado(s)
     </span>
     <?php if ($totalPaginas > 1): ?>
     <nav>
@@ -221,4 +229,63 @@ function corAcao(string $acao): array {
 </div>
 <?php endif; ?>
 
+<style>
+.filtros-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.filtros-grid > .campo-lg { flex: 3 1 220px; }
+.filtros-grid > .campo-md { flex: 2 1 160px; }
+.filtros-grid > .campo-sm { flex: 1 1 130px; }
+.select-dropdown {
+    position: relative;
+}
+.select-dropdown-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: none !important;
+    padding-right: 2.25rem !important;
+    width: 100%;
+}
+.select-dropdown-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #7a8aaa;
+    font-size: .75rem;
+    transition: transform .15s ease;
+}
+.select-dropdown-input:focus + .select-dropdown-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+</style>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formFiltrosAuditoria');
+    if (!form) return;
+
+    const campoUsuario = form.querySelector('input[name="usuario"]');
+    if (campoUsuario) {
+        let timerBusca = null;
+        campoUsuario.addEventListener('input', function() {
+            clearTimeout(timerBusca);
+            timerBusca = setTimeout(function() {
+                form.submit();
+            }, 500);
+        });
+    }
+
+    form.querySelectorAll('select[name="acao"], input[name="data_de"], input[name="data_ate"]').forEach(function(campo) {
+        campo.addEventListener('change', function() {
+            form.submit();
+        });
+    });
+});
+</script>

@@ -54,10 +54,6 @@ class Auth
         $_SESSION['perfil']       = $usuario['perfil'];
         $_SESSION['login_em']     = time();
 
-        // Atualiza último acesso
-        $db->prepare('UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = :id')
-            ->execute([':id' => $usuario['id']]);
-
         // Cookie "lembrar-me"
         if ($lembrar) {
             self::criarTokenLembrar($usuario['id']);
@@ -204,9 +200,6 @@ class Auth
         $_SESSION['usuario_nome'] = $row['nome'];
         $_SESSION['perfil']       = $row['perfil'];
         $_SESSION['login_em']     = time();
-
-        $db->prepare('UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = :id')
-            ->execute([':id' => $row['usuario_id']]);
 
         return true;
     }

@@ -104,7 +104,7 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
 ?>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="usuarios.php" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">
+    <a href="usuarios.php" class="btn btn-outline-secondary btn-sm" style="border-radius:6px;">
         <i class="bi bi-arrow-left"></i>
     </a>
     <div>
@@ -117,33 +117,24 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
 
 <form method="POST" novalidate>
 
-<div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+<div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
 
         <!-- Faixa de identificação -->
-        <div class="d-flex align-items-center gap-3 p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
-            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.3rem;flex-shrink:0;">
-                <?php if ($modo === 'editar' && $dados['nome']): ?>
-                    <?= mb_strtoupper(mb_substr($dados['nome'], 0, 1)) ?>
-                <?php else: ?>
-                    <i class="bi bi-person-plus"></i>
-                <?php endif; ?>
+        <div class="p-4" style="background:linear-gradient(135deg,#1a56a0,#123f78);color:#fff;">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;">
+                <?= $modo === 'editar' ? htmlspecialchars($dados['nome']) : 'Novo Usuário' ?>
             </div>
-            <div>
-                <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.05rem;">
-                    <?= $modo === 'editar' ? htmlspecialchars($dados['nome']) : 'Novo Usuário' ?>
-                </div>
-                <?php if ($modo === 'editar'): ?>
-                <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<?= $id ?></span>
-                <?php else: ?>
-                <span style="font-size:.82rem;opacity:.85;">Conta de acesso ao SysFAA</span>
-                <?php endif; ?>
-            </div>
+            <?php if ($modo === 'editar'): ?>
+            <span class="badge" style="background:rgba(255,255,255,.18);font-weight:500;font-size:.75rem;">ID #<?= $id ?></span>
+            <?php else: ?>
+            <span style="font-size:.82rem;opacity:.85;">Conta de acesso ao SysFAA</span>
+            <?php endif; ?>
         </div>
 
         <div class="card-body p-4 p-md-5">
 
             <?php if ($erro): ?>
-                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" style="border-radius:8px;font-size:.88rem;">
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" style="border-radius:6px;font-size:.88rem;">
                     <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><?= htmlspecialchars($erro) ?>
                 </div>
             <?php endif; ?>
@@ -154,22 +145,22 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
                     <div class="col-md-6">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">Nome completo <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;border-color:#d1dff0;">
+                            <span class="input-group-text bg-white border-end-0" style="border-radius:6px 0 0 6px;border-color:#d1dff0;">
                                 <i class="bi bi-person text-muted"></i>
                             </span>
                             <input type="text" name="nome" class="form-control border-start-0 ps-0"
-                                style="border-radius:0 8px 8px 0;border-color:#d1dff0;text-transform:uppercase;"
+                                style="border-radius:0 6px 6px 0;border-color:#d1dff0;text-transform:uppercase;"
                                 placeholder="Digite o nome completo" value="<?= htmlspecialchars($dados['nome']) ?>" maxlength="120" required autofocus>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label" style="font-weight:500;font-size:.88rem;">E-mail <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0" style="border-radius:8px 0 0 8px;border-color:#d1dff0;">
+                            <span class="input-group-text bg-white border-end-0" style="border-radius:6px 0 0 6px;border-color:#d1dff0;">
                                 <i class="bi bi-envelope text-muted"></i>
                             </span>
                             <input type="email" name="email" class="form-control border-start-0 ps-0"
-                                style="border-radius:0 8px 8px 0;border-color:#d1dff0;"
+                                style="border-radius:0 6px 6px 0;border-color:#d1dff0;"
                                 placeholder="ex.: email@gmail.com" value="<?= htmlspecialchars($dados['email']) ?>" maxlength="150" required>
                         </div>
                     </div>
@@ -210,11 +201,11 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
                         </label>
                         <div class="input-group">
                             <input type="password" id="senha" name="senha" class="form-control"
-                                style="border-radius:8px 0 0 8px;border-color:#d1dff0;"
+                                style="border-radius:6px 0 0 6px;border-color:#d1dff0;"
                                 placeholder="••••••••" minlength="8"
                                 <?= $modo === 'criar' ? 'required' : '' ?>>
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('senha','ico1')"
-                                style="border-color:#d1dff0;border-radius:0 8px 8px 0;">
+                                style="border-color:#d1dff0;border-radius:0 6px 6px 0;">
                                 <i class="bi bi-eye" id="ico1"></i>
                             </button>
                         </div>
@@ -225,11 +216,11 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
                         </label>
                         <div class="input-group">
                             <input type="password" id="senha2" name="senha2" class="form-control"
-                                style="border-radius:8px 0 0 8px;border-color:#d1dff0;"
+                                style="border-radius:6px 0 0 6px;border-color:#d1dff0;"
                                 placeholder="••••••••"
                                 <?= $modo === 'criar' ? 'required' : '' ?>>
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha('senha2','ico2')"
-                                style="border-color:#d1dff0;border-radius:0 8px 8px 0;">
+                                style="border-color:#d1dff0;border-radius:0 6px 6px 0;">
                                 <i class="bi bi-eye" id="ico2"></i>
                             </button>
                         </div>
@@ -240,8 +231,8 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
 </div>
 
 <div class="d-flex justify-content-end gap-2 mt-3">
-    <a href="usuarios.php" class="btn btn-outline-secondary px-4" style="border-radius:8px;">Cancelar</a>
-    <button type="submit" class="btn btn-success px-4" style="border-radius:8px;font-weight:600;">
+    <a href="usuarios.php" class="btn btn-outline-secondary px-4" style="border-radius:6px;">Cancelar</a>
+    <button type="submit" class="btn btn-success px-4" style="border-radius:6px;font-weight:600;">
         <i class="bi bi-floppy me-2"></i>Salvar
     </button>
 </div>
@@ -272,7 +263,7 @@ $iconesPerfil = ['admin' => 'bi-shield-lock-fill', 'administracao' => 'bi-briefc
     height: 100%;
     padding: 16px 10px;
     border: 1.5px solid #d1dff0;
-    border-radius: 10px;
+    border-radius:8px;
     cursor: pointer;
     transition: border-color .15s, background .15s, box-shadow .15s;
 }

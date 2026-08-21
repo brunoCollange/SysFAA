@@ -8,15 +8,15 @@ ServerSignature Off
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Sem RewriteBase fixo: o Apache usa a pasta física do .htaccess como
-    # base automaticamente, então funciona igual em qualquer nome/maiúsculas
-    # de pasta (ex.: /SysFAA no Windows, /sysfaa no Linux).
-
     # Bloqueia acesso direto à pasta de uploads
     RewriteRule ^uploads/ - [F,L]
 
-    # Redireciona raiz para login
-    RewriteRule ^$ auth/login.php [R=302,L]
+    # Redireciona raiz para login. Usa %{REQUEST_URI} (em vez de RewriteBase)
+    # para montar o destino, porque a detecção automática do RewriteBase
+    # é inconsistente entre Apache/Windows e Apache/Linux e pode gerar uma
+    # URL de redirecionamento errada. Assim funciona igual nos dois, com
+    # qualquer maiúsculas/minúsculas de pasta.
+    RewriteRule ^$ %{REQUEST_URI}auth/login.php [R=302,L]
 </IfModule>
 
 # Protege arquivos sensíveis
