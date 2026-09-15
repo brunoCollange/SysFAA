@@ -74,6 +74,7 @@ $msgErro    = $_GET['erro'] ?? '';
 <div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
     <div class="card-body p-3">
         <form method="GET" action="" id="formFiltrosPaciente">
+        <input type="hidden" name="foco" id="campoFoco" value="<?= htmlspecialchars($_GET['foco'] ?? '') ?>">
         <div class="filtros-grid">
             <div class="campo-lg">
                 <label class="form-label mb-1" style="font-size:.72rem;font-weight:500;color:#7a8aaa;text-transform:uppercase;letter-spacing:.04em;">Nome</label>
@@ -85,7 +86,6 @@ $msgErro    = $_GET['erro'] ?? '';
                     value="<?= htmlspecialchars($busca) ?>"
                     style="background:#f4f6fb;border:none;border-radius:6px;"
                     autocomplete="off"
-                    autofocus
                 >
             </div>
 
@@ -326,9 +326,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const formFiltros = document.getElementById('formFiltrosPaciente');
     if (!formFiltros) return;
 
+    const campoFoco = document.getElementById('campoFoco');
+
+    // Recoloca o foco (e o cursor no final) no campo que estava sendo
+    // digitado antes do auto-submit recarregar a página.
+    if (campoFoco.value) {
+        const alvo = formFiltros.querySelector('[name="' + campoFoco.value + '"]');
+        if (alvo && alvo.type === 'text') {
+            alvo.focus();
+            const fim = alvo.value.length;
+            alvo.setSelectionRange(fim, fim);
+        }
+    }
+
     let timerBusca = null;
     formFiltros.querySelectorAll('input[name="q"], input[name="mae"]').forEach(function(campo) {
         campo.addEventListener('input', function() {
+            campoFoco.value = this.name;
             clearTimeout(timerBusca);
             timerBusca = setTimeout(function() {
                 formFiltros.submit();
@@ -339,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataNascimento = formFiltros.querySelector('input[name="nascimento"]');
     if (dataNascimento) {
         dataNascimento.addEventListener('change', function() {
+            campoFoco.value = '';
             formFiltros.submit();
         });
     }

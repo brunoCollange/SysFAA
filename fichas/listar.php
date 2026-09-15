@@ -91,6 +91,7 @@ if ($filtroPaciente) {
         <?php if ($filtroPaciente): ?>
         <input type="hidden" name="paciente_id" value="<?= $filtroPaciente ?>">
         <?php endif; ?>
+        <input type="hidden" name="foco" id="campoFoco" value="<?= htmlspecialchars($_GET['foco'] ?? '') ?>">
         <div class="filtros-grid">
 
             <div class="campo-lg">
@@ -392,9 +393,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const nomeInput = form?.querySelector('input[name="nome"]');
     if (!form) return;
 
+    const campoFoco = document.getElementById('campoFoco');
+
+    // Recoloca o foco (e o cursor no final) no campo que estava sendo
+    // digitado antes do auto-submit recarregar a página.
+    if (campoFoco.value) {
+        const alvo = form.querySelector('[name="' + campoFoco.value + '"]');
+        if (alvo && alvo.type === 'text') {
+            alvo.focus();
+            const fim = alvo.value.length;
+            alvo.setSelectionRange(fim, fim);
+        }
+    }
+
     let timerBusca = null;
     if (nomeInput) {
         nomeInput.addEventListener('input', function() {
+            campoFoco.value = this.name;
             clearTimeout(timerBusca);
             timerBusca = setTimeout(function() {
                 form.submit();
@@ -404,6 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.querySelectorAll('select[name="tipo_id"], input[name="data_de"], input[name="data_ate"]').forEach(function(campo) {
         campo.addEventListener('change', function() {
+            campoFoco.value = '';
             form.submit();
         });
     });

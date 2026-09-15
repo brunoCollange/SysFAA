@@ -91,6 +91,7 @@ function corAcao(string $acao): array {
 <div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
     <div class="card-body p-3">
         <form method="GET" id="formFiltrosAuditoria">
+        <input type="hidden" name="foco" id="campoFoco" value="<?= htmlspecialchars($_GET['foco'] ?? '') ?>">
         <div class="filtros-grid">
 
             <div class="campo-lg">
@@ -271,10 +272,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('formFiltrosAuditoria');
     if (!form) return;
 
+    const campoFoco = document.getElementById('campoFoco');
+
+    // Recoloca o foco (e o cursor no final) no campo que estava sendo
+    // digitado antes do auto-submit recarregar a página.
+    if (campoFoco.value) {
+        const alvo = form.querySelector('[name="' + campoFoco.value + '"]');
+        if (alvo && alvo.type === 'text') {
+            alvo.focus();
+            const fim = alvo.value.length;
+            alvo.setSelectionRange(fim, fim);
+        }
+    }
+
     const campoUsuario = form.querySelector('input[name="usuario"]');
     if (campoUsuario) {
         let timerBusca = null;
         campoUsuario.addEventListener('input', function() {
+            campoFoco.value = this.name;
             clearTimeout(timerBusca);
             timerBusca = setTimeout(function() {
                 form.submit();
@@ -284,6 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.querySelectorAll('select[name="acao"], input[name="data_de"], input[name="data_ate"]').forEach(function(campo) {
         campo.addEventListener('change', function() {
+            campoFoco.value = '';
             form.submit();
         });
     });
