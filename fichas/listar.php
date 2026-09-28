@@ -427,7 +427,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function confirmarExclusao(id, nome) {
     document.getElementById('nomeExcluir').textContent = nome;
-    document.getElementById('btnConfirmarExcluir').href = 'excluir.php?id=' + id;
+    document.getElementById('btnConfirmarExcluir').href =
+        'excluir.php?id=' + id + '&voltar=' + encodeURIComponent(window.location.search);
     new bootstrap.Modal(document.getElementById('modalExcluir')).show();
 }
 

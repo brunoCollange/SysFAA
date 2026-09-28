@@ -13,12 +13,20 @@ Auth::exigirPerfil('admin');
 $db = Database::get();
 $id = (int)($_GET['id'] ?? 0);
 
+// Preserva os filtros/página atuais da listagem ao voltar após a ação
+$voltar = $_GET['voltar'] ?? '';
+$voltar = preg_replace('/[\r\n]/', '', $voltar);
+if ($voltar !== '' && $voltar[0] !== '?') {
+    $voltar = '';
+}
+$sep = $voltar === '' ? '?' : '&';
+
 $stmt = $db->prepare('SELECT * FROM fichas WHERE id = :id LIMIT 1');
 $stmt->execute([':id' => $id]);
 $ficha = $stmt->fetch();
 
 if (!$ficha) {
-    header('Location: listar.php?erro=' . urlencode('Ficha não encontrada.'));
+    header('Location: listar.php' . $voltar . $sep . 'erro=' . urlencode('Ficha não encontrada.'));
     exit;
 }
 
@@ -32,5 +40,5 @@ if (file_exists($caminho)) {
 $db->prepare('DELETE FROM fichas WHERE id = :id')->execute([':id' => $id]);
 Auth::registrarAuditoria(Auth::usuario()['id'], 'excluir_ficha', "Ficha ID $id: {$ficha['nome_original']}");
 
-header('Location: listar.php?ok=' . urlencode("Ficha \"{$ficha['nome_original']}\" excluída com sucesso."));
+header('Location: listar.php' . $voltar . $sep . 'ok=' . urlencode("Ficha \"{$ficha['nome_original']}\" excluída com sucesso."));
 exit;

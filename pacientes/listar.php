@@ -396,7 +396,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function confirmarExclusao(id, nome) {
     document.getElementById('nomeExcluir').textContent = nome;
-    document.getElementById('btnConfirmarExcluir').href = 'excluir.php?id=' + id;
+    document.getElementById('btnConfirmarExcluir').href =
+        'excluir.php?id=' + id + '&voltar=' + encodeURIComponent(window.location.search);
     new bootstrap.Modal(document.getElementById('modalExcluir')).show();
 }
 
@@ -422,7 +423,7 @@ function abrirModalPaciente(tr) {
     document.getElementById('pacienteModalVerFichas').href = '<?= BASE_URL ?>/fichas/listar.php?paciente_id=' + d.id;
 
     const btnEditar = document.getElementById('pacienteModalEditar');
-    if (btnEditar) btnEditar.href = 'editar.php?id=' + d.id;
+    if (btnEditar) btnEditar.href = 'editar.php?id=' + d.id + '&voltar=' + encodeURIComponent(window.location.search);
 
     new bootstrap.Modal(modalPacienteEl).show();
 }

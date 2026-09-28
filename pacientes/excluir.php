@@ -9,8 +9,16 @@ Auth::exigirPerfil('admin','administracao');
 $db = Database::get();
 $id = (int)($_GET['id'] ?? 0);
 
+// Preserva os filtros/página atuais da listagem ao voltar após a ação
+$voltar = $_GET['voltar'] ?? '';
+$voltar = preg_replace('/[\r\n]/', '', $voltar);
+if ($voltar !== '' && $voltar[0] !== '?') {
+    $voltar = '';
+}
+$sep = $voltar === '' ? '?' : '&';
+
 if ($id <= 0) {
-    header('Location: listar.php?erro=' . urlencode('ID inválido.'));
+    header('Location: listar.php' . $voltar . $sep . 'erro=' . urlencode('ID inválido.'));
     exit;
 }
 
@@ -20,7 +28,7 @@ $stmt->execute([':id' => $id]);
 $paciente = $stmt->fetch();
 
 if (!$paciente) {
-    header('Location: listar.php?erro=' . urlencode('Paciente não encontrado.'));
+    header('Location: listar.php' . $voltar . $sep . 'erro=' . urlencode('Paciente não encontrado.'));
     exit;
 }
 
@@ -30,7 +38,7 @@ $fichas->execute([':id' => $id]);
 $qtdFichas = (int)$fichas->fetchColumn();
 
 if ($qtdFichas > 0) {
-    header('Location: listar.php?erro=' . urlencode(
+    header('Location: listar.php' . $voltar . $sep . 'erro=' . urlencode(
         "Não é possível excluir \"{$paciente['nome']}\" pois possui $qtdFichas ficha(s) vinculada(s). Remova as fichas antes."
     ));
     exit;
@@ -40,5 +48,5 @@ if ($qtdFichas > 0) {
 $db->prepare('DELETE FROM pacientes WHERE id = :id')->execute([':id' => $id]);
 Auth::registrarAuditoria(Auth::usuario()['id'], 'paciente_excluido', "Paciente ID $id: {$paciente['nome']}");
 
-header('Location: listar.php?ok=' . urlencode("Paciente \"{$paciente['nome']}\" excluído com sucesso."));
+header('Location: listar.php' . $voltar . $sep . 'ok=' . urlencode("Paciente \"{$paciente['nome']}\" excluído com sucesso."));
 exit;

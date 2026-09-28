@@ -9,12 +9,20 @@ Auth::exigirPerfil(['admin','administracao']);
 $db = Database::get();
 $id = (int)($_GET['id'] ?? 0);
 
+// Preserva os filtros/página da listagem de onde o usuário veio
+$voltar = $_SERVER['REQUEST_METHOD'] === 'POST' ? ($_POST['voltar'] ?? '') : ($_GET['voltar'] ?? '');
+$voltar = preg_replace('/[\r\n]/', '', $voltar);
+if ($voltar !== '' && $voltar[0] !== '?') {
+    $voltar = '';
+}
+$sep = $voltar === '' ? '?' : '&';
+
 $stmt = $db->prepare('SELECT * FROM pacientes WHERE id = :id LIMIT 1');
 $stmt->execute([':id' => $id]);
 $paciente = $stmt->fetch();
 
 if (!$paciente) {
-    header('Location: listar.php?erro=' . urlencode('Paciente não encontrado.'));
+    header('Location: listar.php' . $voltar . $sep . 'erro=' . urlencode('Paciente não encontrado.'));
     exit;
 }
 
@@ -66,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             Auth::registrarAuditoria(Auth::usuario()['id'], 'paciente_editado', "Paciente ID $id: $nome");
 
-            header('Location: listar.php?ok=' . urlencode("Paciente \"$nome\" atualizado com sucesso."));
+            header('Location: listar.php' . $voltar . $sep . 'ok=' . urlencode("Paciente \"$nome\" atualizado com sucesso."));
             exit;
         }
     }
@@ -82,7 +90,7 @@ $qtdFichas = $totalFichas->fetchColumn();
 ?>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="listar.php" class="btn btn-outline-secondary btn-sm" style="border-radius:6px;">
+    <a href="listar.php<?= htmlspecialchars($voltar) ?>" class="btn btn-outline-secondary btn-sm" style="border-radius:6px;">
         <i class="bi bi-arrow-left"></i>
     </a>
     <div>
@@ -92,6 +100,7 @@ $qtdFichas = $totalFichas->fetchColumn();
 </div>
 
 <form method="POST" novalidate>
+<input type="hidden" name="voltar" value="<?= htmlspecialchars($voltar) ?>">
 
 <div class="card border-0 shadow-sm" style="border-radius:8px;overflow:hidden;">
 
@@ -195,7 +204,7 @@ $qtdFichas = $totalFichas->fetchColumn();
 </div>
 
 <div class="d-flex justify-content-end gap-2 mt-3">
-    <a href="listar.php" class="btn btn-outline-secondary px-4" style="border-radius:6px;">Cancelar</a>
+    <a href="listar.php<?= htmlspecialchars($voltar) ?>" class="btn btn-outline-secondary px-4" style="border-radius:6px;">Cancelar</a>
     <button type="submit" class="btn btn-success px-4" style="border-radius:6px;font-weight:600;">
         <i class="bi bi-floppy me-2"></i>Salvar
     </button>
