@@ -41,11 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($nomeMae) > 150) {
         $erro = 'O nome da mãe não pode ultrapassar 150 caracteres.';
     } else {
-        $dup = $db->prepare('SELECT id FROM pacientes WHERE nome = :nome AND id != :id LIMIT 1');
-        $dup->execute([':nome' => $nome, ':id' => $id]);
+        $dup = $db->prepare(
+            'SELECT id FROM pacientes
+             WHERE nome = :nome AND data_nascimento = :data_nascimento AND nome_mae = :nome_mae AND id != :id
+             LIMIT 1'
+        );
+        $dup->execute([
+            ':nome'            => $nome,
+            ':data_nascimento' => $dataNascimento,
+            ':nome_mae'        => $nomeMae,
+            ':id'              => $id,
+        ]);
 
         if ($dup->fetch()) {
-            $erro = 'Já existe outro paciente com este nome.';
+            $erro = 'Já existe outro paciente com este nome, data de nascimento e nome da mãe.';
         } else {
             $db->prepare('UPDATE pacientes SET nome = :nome, data_nascimento = :data_nascimento, nome_mae = :nome_mae WHERE id = :id')
                ->execute([

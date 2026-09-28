@@ -30,11 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = 'O nome da mãe não pode ultrapassar 150 caracteres.';
     } else {
         $db  = Database::get();
-        $dup = $db->prepare('SELECT id FROM pacientes WHERE nome = :nome LIMIT 1');
-        $dup->execute([':nome' => $nome]);
+        $dup = $db->prepare(
+            'SELECT id FROM pacientes
+             WHERE nome = :nome AND data_nascimento = :data_nascimento AND nome_mae = :nome_mae
+             LIMIT 1'
+        );
+        $dup->execute([
+            ':nome'            => $nome,
+            ':data_nascimento' => $dataNascimento,
+            ':nome_mae'        => $nomeMae,
+        ]);
 
         if ($dup->fetch()) {
-            $erro = 'Já existe um paciente cadastrado com este nome.';
+            $erro = 'Já existe um paciente cadastrado com este nome, data de nascimento e nome da mãe.';
         } else {
             $db->prepare('INSERT INTO pacientes (nome, data_nascimento, nome_mae) VALUES (:nome, :data_nascimento, :nome_mae)')
                ->execute([

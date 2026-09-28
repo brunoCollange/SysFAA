@@ -54,6 +54,23 @@ $pacientes = $stmt->fetchAll();
 // Mensagem de feedback
 $msgSucesso = $_GET['ok']   ?? '';
 $msgErro    = $_GET['erro'] ?? '';
+
+// Detecta pacientes duplicados já existentes na base (mesmo nome + data de
+// nascimento + nome da mãe) — checagem independente da busca/paginação acima,
+// pois o sistema já estava em produção quando essa validação foi endurecida.
+$duplicados = $db->query(
+    "SELECT nome, data_nascimento, nome_mae, COUNT(*) AS total
+     FROM pacientes
+     GROUP BY nome, data_nascimento, nome_mae
+     HAVING COUNT(*) > 1"
+)->fetchAll();
+
+$chavesDuplicadas  = [];
+$totalRegDuplicados = 0;
+foreach ($duplicados as $d) {
+    $chavesDuplicadas[$d['nome'] . '|' . $d['data_nascimento'] . '|' . $d['nome_mae']] = true;
+    $totalRegDuplicados += (int)$d['total'];
+}
 ?>
 
 <!-- Alertas -->
@@ -67,6 +84,16 @@ $msgErro    = $_GET['erro'] ?? '';
 <div class="alert alert-danger d-flex align-items-center gap-2 mb-3" style="border-radius:8px;font-size:.88rem;" role="alert">
     <i class="bi bi-exclamation-circle-fill"></i>
     <?= htmlspecialchars($msgErro) ?>
+</div>
+<?php endif; ?>
+<?php if (!empty($duplicados)): ?>
+<div class="alert alert-warning d-flex align-items-start gap-2 mb-3" style="border-radius:8px;font-size:.88rem;" role="alert">
+    <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+    <div>
+        <strong><?= count($duplicados) ?> grupo(s) de pacientes duplicados</strong> encontrados na base
+        (<?= $totalRegDuplicados ?> cadastros ao todo com o mesmo nome, data de nascimento e nome da mãe).
+        Os registros afetados estão marcados com <span class="badge" style="background:#fff3cd;color:#997404;border-radius:4px;padding:3px 7px;font-size:.72rem;font-weight:600;">Duplicata</span> abaixo — revise e mantenha apenas um cadastro por paciente.
+    </div>
 </div>
 <?php endif; ?>
 
@@ -159,9 +186,12 @@ $msgErro    = $_GET['erro'] ?? '';
                     </tr>
                 </thead>
                 <tbody id="corpoTabelaPacientes">
-                    <?php foreach ($pacientes as $p): ?>
+                    <?php foreach ($pacientes as $p):
+                        $chaveDup = $p['nome'] . '|' . $p['data_nascimento'] . '|' . $p['nome_mae'];
+                        $ehDuplicado = isset($chavesDuplicadas[$chaveDup]);
+                    ?>
                     <tr class="linha-paciente"
-                        style="cursor:pointer;"
+                        style="cursor:pointer;<?= $ehDuplicado ? 'background:#fffaf0;' : '' ?>"
                         onclick="abrirModalPaciente(this)"
                         data-id="<?= $p['id'] ?>"
                         data-nome="<?= htmlspecialchars($p['nome'], ENT_QUOTES) ?>"
@@ -173,9 +203,14 @@ $msgErro    = $_GET['erro'] ?? '';
                             <?= $p['id'] ?>
                         </td>
                         <td style="max-width:0;">
-                            <span class="text-truncate d-block" style="font-weight:500;color:#1e2d45;" title="<?= htmlspecialchars($p['nome']) ?>">
-                                <?= htmlspecialchars($p['nome']) ?>
-                            </span>
+                            <div class="d-flex align-items-center gap-2" style="min-width:0;">
+                                <span class="text-truncate" style="font-weight:500;color:#1e2d45;min-width:0;" title="<?= htmlspecialchars($p['nome']) ?>">
+                                    <?= htmlspecialchars($p['nome']) ?>
+                                </span>
+                                <?php if ($ehDuplicado): ?>
+                                <span class="badge" style="background:#fff3cd;color:#997404;border-radius:4px;padding:3px 7px;font-size:.7rem;font-weight:600;flex-shrink:0;" title="Existe outro paciente com o mesmo nome, data de nascimento e nome da mãe">Duplicata</span>
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td class="text-muted text-truncate" style="font-size:.85rem;max-width:0;">
                             <?= $p['nome_mae'] ? htmlspecialchars($p['nome_mae']) : '—' ?>
